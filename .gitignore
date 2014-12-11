@@ -26,3 +26,8 @@
 *.exe
 *.out
 *.app
+
+# Dev-studio crap
+*.ncb
+*.suo
+*.user
