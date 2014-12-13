@@ -1,9 +1,30 @@
-// List.cpp
+// List.hpp
 
-#include "List.h"
+template< typename Data >
+inline /*static*/ void DefaultDataFactory< Data >::Create( Data& data )
+{
+}
+
+template< typename Data >
+inline /*static*/ void DefaultDataFactory< Data >::Destroy( Data& data )
+{
+}
+
+template< typename Data >
+inline /*static*/ void DeletingDataFactory< Data >::Create( Data& data )
+{
+	data = 0;
+}
+
+template< typename Data >
+inline /*static*/ void DeletingDataFactory< Data >::Destroy( Data& data )
+{
+	delete data;
+	data = 0;
+};
 
 template< typename Data, class DataFactory >
-List< Data, DataFactory >::List( void )
+inline List< Data, DataFactory >::List( void )
 {
 	count = 0;
 
@@ -12,13 +33,13 @@ List< Data, DataFactory >::List( void )
 }
 
 template< typename Data, class DataFactory >
-List< Data, DataFactory >::~List( void )
+inline List< Data, DataFactory >::~List( void )
 {
 	RemoveAll();
 }
 
 template< typename Data, class DataFactory >
-List< Data, DataFactory >::Node::Node( void )
+inline List< Data, DataFactory >::Node::Node( void )
 {
 	next = 0;
 	prev = 0;
@@ -29,13 +50,13 @@ List< Data, DataFactory >::Node::Node( void )
 }
 
 template< typename Data, class DataFactory >
-List< Data, DataFactory >::Node::~Node( void )
+inline List< Data, DataFactory >::Node::~Node( void )
 {
 	DataFactory::Destroy( data );
 }
 
 template< typename Data, class DataFactory >
-void List< Data, DataFactory >::Node::Couple( Node* before, Node* after )
+inline void List< Data, DataFactory >::Node::Couple( Node* before, Node* after )
 {
 	before->next = this;
 	after->prev = this;
@@ -45,7 +66,7 @@ void List< Data, DataFactory >::Node::Couple( Node* before, Node* after )
 }
 
 template< typename Data, class DataFactory >
-void List< Data, DataFactory >::Node::Decouple( void )
+inline void List< Data, DataFactory >::Node::Decouple( void )
 {
 	if( next )
 		next->prev = prev;
@@ -57,25 +78,25 @@ void List< Data, DataFactory >::Node::Decouple( void )
 }
 
 template< typename Data, class DataFactory >
-int List< Data, DataFactory >::Count( void ) const
+inline int List< Data, DataFactory >::Count( void ) const
 {
 	return count;
 }
 
 template< typename Data, class DataFactory >
-typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Head( void )
+inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Head( void )
 {
 	return head;
 }
 
 template< typename Data, class DataFactory >
-typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Tail( void )
+inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Tail( void )
 {
 	return tail;
 }
 
 template< typename Data, class DataFactory >
-typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertBefore( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
+inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertBefore( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
 		insertedNode = new Node();
@@ -100,7 +121,7 @@ typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertBefor
 }
 
 template< typename Data, class DataFactory >
-typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertAfter( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
+inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertAfter( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
 		insertedNode = new Node();
@@ -125,7 +146,7 @@ typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertAfter
 }
 
 template< typename Data, class DataFactory >
-bool List< Data, DataFactory >::Remove( Node* node, bool deleteNode /*= true*/ )
+inline bool List< Data, DataFactory >::Remove( Node* node, bool deleteNode /*= true*/ )
 {
 	if( node->list != this )
 		return false;
@@ -146,14 +167,39 @@ bool List< Data, DataFactory >::Remove( Node* node, bool deleteNode /*= true*/ )
 }
 
 template< typename Data, class DataFactory >
-bool RemoveAll( void )
+inline bool List< Data, DataFactory >::RemoveAll( void )
 {
 	while( count > 0 )
-		Remove( head, true );
+		if( !Remove( head, true ) )
+			return false;
+
+	return true;
 }
 
 template< typename Data, class DataFactory >
-int List< Data, DataFactory >::Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc )
+inline void List< Data, DataFactory >::Absorb( List* list )
+{
+	if( count == 0 )
+	{
+		head = list->head;
+		tail = list->tail;
+	}
+	else
+	{
+		tail->next = list->head;
+		tail->next->prev = tail;
+		tail = list->tail;
+	}
+
+	count = list->count;
+
+	list->head = 0;
+	list->tail = 0;
+	list->count = 0;
+}
+
+template< typename Data, class DataFactory >
+inline int List< Data, DataFactory >::Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc )
 {
 	int adjacentSwapCount = 0;
 
@@ -187,4 +233,4 @@ int List< Data, DataFactory >::Sort( SortOrder sortOrder, SortCompareFunc sortCo
 	return adjacentSwapCount;
 }
 
-// List.cpp
+// List.hpp

@@ -172,15 +172,43 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Code\BilinearForm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\BilinearForm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\GACompute.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Code\GACompute.h"
 				>
 			</File>
 			<File
-				RelativePath=".\List.cpp"
+				RelativePath=".\Code\List.h"
 				>
 			</File>
 			<File
-				RelativePath=".\List.h"
+				RelativePath=".\Code\List.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\Multivector.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\Multivector.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\Scalar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\Scalar.h"
 				>
 			</File>
 		</Filter>

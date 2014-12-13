@@ -62,6 +62,8 @@ public:
 	bool Remove( Node* node, bool deleteNode = true );
 	bool RemoveAll( void );
 
+	void Absorb( List* list );
+
 	typedef int ( *SortCompareFunc )( Data dataA, Data dataB );
 
 	enum SortOrder { SORT_ASCENDING, SORT_DESCENDING };
@@ -73,5 +75,7 @@ private:
 	Node* tail;
 	int count;
 };
+
+#include "List.hpp"
 
 // List.h
