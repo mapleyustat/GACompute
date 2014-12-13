@@ -31,3 +31,6 @@
 *.ncb
 *.suo
 *.user
+
+# Intermediates and built files
+Build/

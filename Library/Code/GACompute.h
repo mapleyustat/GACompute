@@ -2,6 +2,7 @@
 
 #pragma once
 
+#if 0
 namespace GACompute
 {
 	// put all classes at same scope and break into seperate files.
@@ -59,5 +60,6 @@ namespace GACompute
 		TermList sum;
 	};
 }
+#endif
 
 // GACompute.h
