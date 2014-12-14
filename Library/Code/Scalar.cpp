@@ -6,6 +6,7 @@ using namespace GACompute;
 
 Scalar::Scalar( void )
 {
+	sumOfTermsDenominator.InsertAfter()->data = new Term();
 }
 
 Scalar::~Scalar( void )
@@ -22,6 +23,8 @@ void Scalar::Assign( const char* variable )
 
 void Scalar::Assign( const Scalar& scalar )
 {
+	sumOfTermsNumerator.Copy( scalar.sumOfTermsNumerator );
+	sumOfTermsDenominator.Copy( scalar.sumOfTermsDenominator );
 }
 
 void Scalar::AssignSum( const Scalar& scalarA, const Scalar& scalarB )
@@ -54,13 +57,18 @@ Scalar::Factor::Factor( void )
 {
 }
 
-Scalar::NumericalFactor::NumericalFactor( void )
+Scalar::NumericalFactor::NumericalFactor( double number )
 {
-	number = 0.0;
+	this->number = number;
 }
 
 /*virtual*/ Scalar::NumericalFactor::~NumericalFactor( void )
 {
+}
+
+/*virtual*/ Scalar::Factor* Scalar::NumericalFactor::Clone( void ) const
+{
+	return new NumericalFactor( number );
 }
 
 Scalar::VariableFactor::VariableFactor( const char* name )
@@ -73,6 +81,11 @@ Scalar::VariableFactor::VariableFactor( const char* name )
 /*virtual*/ Scalar::VariableFactor::~VariableFactor( void )
 {
 	delete[] name;
+}
+
+/*virtual*/ Scalar::Factor* Scalar::VariableFactor::Clone( void ) const
+{
+	return new VariableFactor( name );
 }
 
 Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char* vectorB )
@@ -92,12 +105,26 @@ Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char*
 	delete[] vectorB;
 }
 
+/*virtual*/ Scalar::Factor* Scalar::InnerProductFactor::Clone( void ) const
+{
+	return new InnerProductFactor( vectorA, vectorB );
+}
+
 Scalar::Term::Term( void )
 {
 }
 
 Scalar::Term::~Term( void )
 {
+}
+
+Scalar::Term* Scalar::Term::Clone( void ) const
+{
+	Term* clonedTerm = new Term();
+
+	clonedTerm->productOfFactors.Copy( productOfFactors );
+
+	return clonedTerm;
 }
 
 void Scalar::Term::CollectFactors( void )

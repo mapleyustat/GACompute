@@ -11,6 +11,12 @@ inline /*static*/ void BlankDataManager< Data >::Destroy( Data& data )
 }
 
 template< typename Data >
+inline /*static*/ void BlankDataManager< Data >::Copy( Data& dataA, const Data& dataB )
+{
+	dataA = dataB;
+}
+
+template< typename Data >
 inline /*static*/ int BlankDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
 {
 	return 0;
@@ -28,6 +34,12 @@ inline /*static*/ void DefaultDataManager< Data >::Destroy( Data& data )
 	delete data;
 	data = 0;
 };
+
+template< typename Data >
+inline /*static*/ void DefaultDataManager< Data >::Copy( Data& dataA, const Data& dataB )
+{
+	dataA = dataB->Clone();
+}
 
 template< typename Data >
 inline /*static*/ int DefaultDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
@@ -208,6 +220,25 @@ inline void List< Data, DataManager >::Absorb( List* list )
 	list->head = 0;
 	list->tail = 0;
 	list->count = 0;
+}
+
+template< typename Data, class DataManager >
+inline void List< Data, DataManager >::Concatinate( const List& list )
+{
+	const Node* node = list.head;
+	while( node )
+	{
+		Node* insertedNode = InsertAfter( tail );
+		DataManager::Copy( insertedNode->data, node->data );
+		node = node->next;
+	}
+}
+
+template< typename Data, class DataManager >
+inline void List< Data, DataManager >::Copy( const List& list )
+{
+	RemoveAll();
+	Concatinate( list );
 }
 
 template< typename Data, class DataManager >

@@ -31,6 +31,8 @@ private:
 		Vector( const char* name );
 		~Vector( void );
 
+		Vector* Clone( void ) const;
+
 		char* name;
 	};
 
@@ -41,8 +43,11 @@ private:
 		Term( void );
 		~Term( void );
 
+		Term* Clone( void ) const;
+
 		Scalar* coeficient;
 
+		// An empty list is one.
 		typedef List< Vector* > ProductOfVectors;
 		ProductOfVectors productOfVectors;
 
@@ -50,6 +55,7 @@ private:
 		ProductType productType;
 	};
 
+	// An empty list is zero.
 	typedef List< Term* > SumOfTerms;
 	SumOfTerms sumOfTerms;
 

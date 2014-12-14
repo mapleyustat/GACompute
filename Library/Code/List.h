@@ -8,6 +8,7 @@ class BlankDataManager
 public:
 	static void Create( Data& data );
 	static void Destroy( Data& data );
+	static void Copy( Data& dataA, const Data& dataB );
 	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
@@ -17,6 +18,7 @@ class DefaultDataManager
 public:
 	static void Create( Data& data );
 	static void Destroy( Data& data );
+	static void Copy( Data& dataA, const Data& dataB );
 	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
@@ -65,6 +67,8 @@ public:
 	bool RemoveAll( void );
 
 	void Absorb( List* list );
+	void Concatinate( const List& list );
+	void Copy( const List& list );
 
 	typedef int ( *SortCompareFunc )( Data dataA, Data dataB );
 

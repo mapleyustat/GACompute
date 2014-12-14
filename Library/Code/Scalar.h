@@ -26,6 +26,8 @@ private:
 		Factor( void );
 		virtual ~Factor( void );
 
+		virtual Factor* Clone( void ) const = 0;
+
 		int exponent;
 	};
 
@@ -33,8 +35,10 @@ private:
 	{
 	public:
 
-		NumericalFactor( void );
+		NumericalFactor( double number );
 		virtual ~NumericalFactor( void );
+
+		virtual Factor* Clone( void ) const override;
 
 		double number;
 	};
@@ -46,6 +50,8 @@ private:
 		VariableFactor( const char* name );
 		virtual ~VariableFactor( void );
 
+		virtual Factor* Clone( void ) const override;
+
 		char* name;
 	};
 
@@ -55,6 +61,8 @@ private:
 
 		InnerProductFactor( const char* vectorA, const char* vectorB );
 		virtual ~InnerProductFactor( void );
+
+		virtual Factor* Clone( void ) const override;
 
 		char* vectorA;
 		char* vectorB;
@@ -67,12 +75,16 @@ private:
 		Term( void );
 		~Term( void );
 
+		Term* Clone( void ) const;
+
+		// An empty list is one.
 		typedef List< Factor* > ProductOfFactors;
 		ProductOfFactors productOfFactors;
 
 		void CollectFactors( void );
 	};
 
+	// An empty list is zero.
 	typedef List< Term* > SumOfTerms;
 	SumOfTerms sumOfTermsNumerator;
 	SumOfTerms sumOfTermsDenominator;

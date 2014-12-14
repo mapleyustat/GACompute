@@ -21,4 +21,9 @@ namespace GACompute
 
 extern GACompute::BilinearForm* theBilinearForm;
 
+// STPTODO: An expression expander simply evaluates an expression tree.
+//          A factorer, on the other hand, does the reverse, taking an expression
+//          and turning it into an expression tree.  Support for expansions and
+//          factorizations would be useful and interesting.
+
 // GACompute.h

@@ -14,6 +14,7 @@ Multivector::~Multivector( void )
 
 void Multivector::Assign( const Multivector& multivector )
 {
+	sumOfTerms.Copy( multivector.sumOfTerms );
 }
 
 void Multivector::AssignScalar( const Scalar& scalar )
@@ -69,6 +70,11 @@ Multivector::Vector::~Vector( void )
 	delete[] name;
 }
 
+Multivector::Vector* Multivector::Vector::Clone( void ) const
+{
+	return new Vector( name );
+}
+
 Multivector::Term::Term( void )
 {
 	coeficient = new Scalar();
@@ -79,6 +85,17 @@ Multivector::Term::Term( void )
 Multivector::Term::~Term( void )
 {
 	delete coeficient;
+}
+
+Multivector::Term* Multivector::Term::Clone( void ) const
+{
+	Term* clonedTerm = new Term();
+
+	clonedTerm->coeficient->Assign( *coeficient );
+	clonedTerm->productType = productType;
+	clonedTerm->productOfVectors.Copy( productOfVectors );
+
+	return clonedTerm;
 }
 
 void Multivector::CollectTerms( void )
