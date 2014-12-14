@@ -43,13 +43,15 @@ private:
 
 		Scalar* coeficient;
 
-		List< Vector*, DeletingDataFactory< Vector* > > productOfVectors;
+		typedef List< Vector* > ProductOfVectors;
+		ProductOfVectors productOfVectors;
 
 		enum ProductType { GEOMETRIC_PRODUCT, OUTER_PRODUCT };
 		ProductType productType;
 	};
 
-	List< Term*, DeletingDataFactory< Term* > > sumOfTerms;
+	typedef List< Term* > SumOfTerms;
+	SumOfTerms sumOfTerms;
 
 	void CollectTerms( void );
 

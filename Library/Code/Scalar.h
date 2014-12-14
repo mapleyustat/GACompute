@@ -67,13 +67,15 @@ private:
 		Term( void );
 		~Term( void );
 
-		List< Factor*, DeletingDataFactory< Factor* > > productOfFactors;
+		typedef List< Factor* > ProductOfFactors;
+		ProductOfFactors productOfFactors;
 
 		void CollectFactors( void );
 	};
 
-	List< Term*, DeletingDataFactory< Term* > > sumOfTermsNumerator;
-	List< Term*, DeletingDataFactory< Term* > > sumOfTermsDenominator;
+	typedef List< Term* > SumOfTerms;
+	SumOfTerms sumOfTermsNumerator;
+	SumOfTerms sumOfTermsDenominator;
 
 	void CollectTerms( void );
 };

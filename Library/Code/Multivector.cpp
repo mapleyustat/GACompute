@@ -10,7 +10,6 @@ Multivector::Multivector( void )
 
 Multivector::~Multivector( void )
 {
-	sumOfTerms.RemoveAll();
 }
 
 void Multivector::Assign( const Multivector& multivector )
@@ -80,8 +79,6 @@ Multivector::Term::Term( void )
 Multivector::Term::~Term( void )
 {
 	delete coeficient;
-
-	productOfVectors.RemoveAll();
 }
 
 void Multivector::CollectTerms( void )

@@ -10,8 +10,6 @@ Scalar::Scalar( void )
 
 Scalar::~Scalar( void )
 {
-	sumOfTermsNumerator.RemoveAll();
-	sumOfTermsDenominator.RemoveAll();
 }
 
 void Scalar::Assign( double number )
@@ -100,7 +98,6 @@ Scalar::Term::Term( void )
 
 Scalar::Term::~Term( void )
 {
-	productOfFactors.RemoveAll();
 }
 
 void Scalar::Term::CollectFactors( void )

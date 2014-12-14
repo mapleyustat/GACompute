@@ -3,22 +3,24 @@
 #pragma once
 
 template< typename Data >
-class DefaultDataFactory
+class BlankDataManager
 {
 public:
 	static void Create( Data& data );
 	static void Destroy( Data& data );
+	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
 template< typename Data >
-class DeletingDataFactory
+class DefaultDataManager
 {
 public:
 	static void Create( Data& data );
 	static void Destroy( Data& data );
+	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
-template< typename Data, class DataFactory = DefaultDataFactory< Data > >
+template< typename Data, class DataManager = DefaultDataManager< Data > >
 class List
 {
 public:

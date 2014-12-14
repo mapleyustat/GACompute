@@ -1,30 +1,42 @@
 // List.hpp
 
 template< typename Data >
-inline /*static*/ void DefaultDataFactory< Data >::Create( Data& data )
+inline /*static*/ void BlankDataManager< Data >::Create( Data& data )
 {
 }
 
 template< typename Data >
-inline /*static*/ void DefaultDataFactory< Data >::Destroy( Data& data )
+inline /*static*/ void BlankDataManager< Data >::Destroy( Data& data )
 {
 }
 
 template< typename Data >
-inline /*static*/ void DeletingDataFactory< Data >::Create( Data& data )
+inline /*static*/ int BlankDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
+{
+	return 0;
+}
+
+template< typename Data >
+inline /*static*/ void DefaultDataManager< Data >::Create( Data& data )
 {
 	data = 0;
 }
 
 template< typename Data >
-inline /*static*/ void DeletingDataFactory< Data >::Destroy( Data& data )
+inline /*static*/ void DefaultDataManager< Data >::Destroy( Data& data )
 {
 	delete data;
 	data = 0;
 };
 
-template< typename Data, class DataFactory >
-inline List< Data, DataFactory >::List( void )
+template< typename Data >
+inline /*static*/ int DefaultDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
+{
+	return Data::SortCompare( dataA, dataB );
+}
+
+template< typename Data, class DataManager >
+inline List< Data, DataManager >::List( void )
 {
 	count = 0;
 
@@ -32,31 +44,31 @@ inline List< Data, DataFactory >::List( void )
 	tail = 0;
 }
 
-template< typename Data, class DataFactory >
-inline List< Data, DataFactory >::~List( void )
+template< typename Data, class DataManager >
+inline List< Data, DataManager >::~List( void )
 {
 	RemoveAll();
 }
 
-template< typename Data, class DataFactory >
-inline List< Data, DataFactory >::Node::Node( void )
+template< typename Data, class DataManager >
+inline List< Data, DataManager >::Node::Node( void )
 {
 	next = 0;
 	prev = 0;
 
 	list = 0;
 
-	DataFactory::Create( data );
+	DataManager::Create( data );
 }
 
-template< typename Data, class DataFactory >
-inline List< Data, DataFactory >::Node::~Node( void )
+template< typename Data, class DataManager >
+inline List< Data, DataManager >::Node::~Node( void )
 {
-	DataFactory::Destroy( data );
+	DataManager::Destroy( data );
 }
 
-template< typename Data, class DataFactory >
-inline void List< Data, DataFactory >::Node::Couple( Node* before, Node* after )
+template< typename Data, class DataManager >
+inline void List< Data, DataManager >::Node::Couple( Node* before, Node* after )
 {
 	before->next = this;
 	after->prev = this;
@@ -65,8 +77,8 @@ inline void List< Data, DataFactory >::Node::Couple( Node* before, Node* after )
 	prev = before;
 }
 
-template< typename Data, class DataFactory >
-inline void List< Data, DataFactory >::Node::Decouple( void )
+template< typename Data, class DataManager >
+inline void List< Data, DataManager >::Node::Decouple( void )
 {
 	if( next )
 		next->prev = prev;
@@ -77,26 +89,26 @@ inline void List< Data, DataFactory >::Node::Decouple( void )
 	prev = 0;
 }
 
-template< typename Data, class DataFactory >
-inline int List< Data, DataFactory >::Count( void ) const
+template< typename Data, class DataManager >
+inline int List< Data, DataManager >::Count( void ) const
 {
 	return count;
 }
 
-template< typename Data, class DataFactory >
-inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Head( void )
+template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Head( void )
 {
 	return head;
 }
 
-template< typename Data, class DataFactory >
-inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Tail( void )
+template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Tail( void )
 {
 	return tail;
 }
 
-template< typename Data, class DataFactory >
-inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertBefore( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
+template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::InsertBefore( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
 		insertedNode = new Node();
@@ -120,8 +132,8 @@ inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Inse
 	return insertedNode;
 }
 
-template< typename Data, class DataFactory >
-inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::InsertAfter( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
+template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::InsertAfter( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
 		insertedNode = new Node();
@@ -145,8 +157,8 @@ inline typename List< Data, DataFactory >::Node* List< Data, DataFactory >::Inse
 	return insertedNode;
 }
 
-template< typename Data, class DataFactory >
-inline bool List< Data, DataFactory >::Remove( Node* node, bool deleteNode /*= true*/ )
+template< typename Data, class DataManager >
+inline bool List< Data, DataManager >::Remove( Node* node, bool deleteNode /*= true*/ )
 {
 	if( node->list != this )
 		return false;
@@ -166,8 +178,8 @@ inline bool List< Data, DataFactory >::Remove( Node* node, bool deleteNode /*= t
 	return true;
 }
 
-template< typename Data, class DataFactory >
-inline bool List< Data, DataFactory >::RemoveAll( void )
+template< typename Data, class DataManager >
+inline bool List< Data, DataManager >::RemoveAll( void )
 {
 	while( count > 0 )
 		if( !Remove( head, true ) )
@@ -176,8 +188,8 @@ inline bool List< Data, DataFactory >::RemoveAll( void )
 	return true;
 }
 
-template< typename Data, class DataFactory >
-inline void List< Data, DataFactory >::Absorb( List* list )
+template< typename Data, class DataManager >
+inline void List< Data, DataManager >::Absorb( List* list )
 {
 	if( count == 0 )
 	{
@@ -198,8 +210,8 @@ inline void List< Data, DataFactory >::Absorb( List* list )
 	list->count = 0;
 }
 
-template< typename Data, class DataFactory >
-inline int List< Data, DataFactory >::Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc )
+template< typename Data, class DataManager >
+inline int List< Data, DataManager >::Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc )
 {
 	int adjacentSwapCount = 0;
 
