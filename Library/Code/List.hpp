@@ -102,6 +102,18 @@ inline void List< Data, DataManager >::Node::Decouple( void )
 }
 
 template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Node::Next( void )
+{
+	return next;
+}
+
+template< typename Data, class DataManager >
+inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Node::Prev( void )
+{
+	return prev;
+}
+
+template< typename Data, class DataManager >
 inline int List< Data, DataManager >::Count( void ) const
 {
 	return count;
@@ -242,7 +254,7 @@ inline void List< Data, DataManager >::Copy( const List& list )
 }
 
 template< typename Data, class DataManager >
-inline int List< Data, DataManager >::Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc )
+inline int List< Data, DataManager >::Sort( SortOrder sortOrder )
 {
 	int adjacentSwapCount = 0;
 
@@ -256,7 +268,7 @@ inline int List< Data, DataManager >::Sort( SortOrder sortOrder, SortCompareFunc
 		{
 			Node* next = node->next;
 
-			int result = sortCompareFunc( node->data, next->data );
+			int result = DataManager::SortCompare( node->data, next->data );
 
 			if( ( result > 0 && sortOrder == SORT_ASCENDING ) || ( result < 0 && sortOrder == SORT_DESCENDING ) )
 			{

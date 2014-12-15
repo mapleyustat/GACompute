@@ -50,11 +50,33 @@ void Scalar::CollectTerms( void )
 
 Scalar::Factor::Factor( void )
 {
-	exponent = 0;
+	exponent = 1;
 }
 
 /*virtual*/ Scalar::Factor::~Factor( void )
 {
+}
+
+/*virtual*/ bool Scalar::Factor::IsOne( void ) const
+{
+	if( exponent == 0 )
+		return true;
+
+	return false;
+}
+
+/*static*/ int Scalar::Factor::SortCompare( const Factor* factorA, const Factor* factorB )
+{
+	int typeA = factorA->ReturnType();
+	int typeB = factorB->ReturnType();
+
+	if( typeA < typeB )
+		return -1;
+
+	if( typeA > typeB )
+		return 1;
+
+	return 0;
 }
 
 Scalar::NumericalFactor::NumericalFactor( double number )
@@ -66,9 +88,32 @@ Scalar::NumericalFactor::NumericalFactor( double number )
 {
 }
 
+/*virtual*/ Scalar::Factor::Type Scalar::NumericalFactor::ReturnType( void ) const
+{
+	return NUMERICAL;
+}
+
 /*virtual*/ Scalar::Factor* Scalar::NumericalFactor::Clone( void ) const
 {
 	return new NumericalFactor( number );
+}
+
+/*virtual*/ bool Scalar::NumericalFactor::CombineWith( const Factor* factor )
+{
+	if( factor->ReturnType() != NUMERICAL )
+		return false;
+
+	const NumericalFactor* numericalFactor = ( const NumericalFactor* )factor;
+	number *= numericalFactor->number;
+	return true;
+}
+
+/*virtual*/ bool Scalar::NumericalFactor::IsOne( void ) const
+{
+	if( number == 1.0 )
+		return true;
+	
+	return false;
 }
 
 Scalar::VariableFactor::VariableFactor( const char* name )
@@ -83,9 +128,28 @@ Scalar::VariableFactor::VariableFactor( const char* name )
 	delete[] name;
 }
 
+/*virtual*/ Scalar::Factor::Type Scalar::VariableFactor::ReturnType( void ) const
+{
+	return VARIABLE;
+}
+
 /*virtual*/ Scalar::Factor* Scalar::VariableFactor::Clone( void ) const
 {
 	return new VariableFactor( name );
+}
+
+/*virtual*/ bool Scalar::VariableFactor::CombineWith( const Factor* factor )
+{
+	if( factor->ReturnType() != VARIABLE )
+		return false;
+
+	const VariableFactor* variableFactor = ( const VariableFactor* )factor;
+
+	if( strcmp( name, variableFactor->name ) != 0 )
+		return false;
+
+	exponent += factor->exponent;
+	return true;
 }
 
 Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char* vectorB )
@@ -105,9 +169,31 @@ Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char*
 	delete[] vectorB;
 }
 
+/*virtual*/ Scalar::Factor::Type Scalar::InnerProductFactor::ReturnType( void ) const
+{
+	return INNER_PRODUCT;
+}
+
 /*virtual*/ Scalar::Factor* Scalar::InnerProductFactor::Clone( void ) const
 {
 	return new InnerProductFactor( vectorA, vectorB );
+}
+
+/*virtual*/ bool Scalar::InnerProductFactor::CombineWith( const Factor* factor )
+{
+	if( factor->ReturnType() != INNER_PRODUCT )
+		return false;
+
+	const InnerProductFactor* innerProductFactor = ( const InnerProductFactor* )factor;
+
+	if( strcmp( vectorA, innerProductFactor->vectorA ) != 0 )
+		return false;
+
+	if( strcmp( vectorB, innerProductFactor->vectorB ) != 0 )
+		return false;
+
+	exponent += factor->exponent;
+	return true;
 }
 
 Scalar::Term::Term( void )
@@ -127,8 +213,41 @@ Scalar::Term* Scalar::Term::Clone( void ) const
 	return clonedTerm;
 }
 
-void Scalar::Term::CollectFactors( void )
+void Scalar::Term::CombineFactors( void )
 {
+	ProductOfFactors::Node* nodeA = productOfFactors.Head();
+	while( nodeA )
+	{
+		Factor* factorA = nodeA->data;
+
+		ProductOfFactors::Node* nodeB = nodeA->Next();
+		while( nodeB )
+		{
+			Factor* factorB = nodeB->data;
+
+			ProductOfFactors::Node* nextNodeB = nodeB->Next();
+
+			if( factorA->CombineWith( factorB ) )
+				productOfFactors.Remove( nodeB );
+
+			nodeB = nextNodeB;
+		}
+
+		nodeA = nodeA->Next();
+	}
+
+	nodeA = productOfFactors.Head();
+	while( nodeA )
+	{
+		Factor* factorA = nodeA->data;
+
+		ProductOfFactors::Node* nextNodeA = nodeA->Next();
+
+		if( factorA->IsOne() )
+			productOfFactors.Remove( nodeA );
+
+		nodeA = nextNodeA;
+	}
 }
 
 // Scalar.cpp

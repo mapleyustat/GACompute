@@ -70,10 +70,8 @@ public:
 	void Concatinate( const List& list );
 	void Copy( const List& list );
 
-	typedef int ( *SortCompareFunc )( Data dataA, Data dataB );
-
 	enum SortOrder { SORT_ASCENDING, SORT_DESCENDING };
-	int Sort( SortOrder sortOrder, SortCompareFunc sortCompareFunc );
+	int Sort( SortOrder sortOrder );
 
 private:
 

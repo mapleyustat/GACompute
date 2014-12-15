@@ -26,7 +26,14 @@ private:
 		Factor( void );
 		virtual ~Factor( void );
 
+		enum Type { NUMERICAL, VARIABLE, INNER_PRODUCT };
+
+		virtual Type ReturnType( void ) const = 0;
 		virtual Factor* Clone( void ) const = 0;
+		virtual bool CombineWith( const Factor* factor ) = 0;
+		virtual bool IsOne( void ) const;
+
+		static int SortCompare( const Factor* factorA, const Factor* factorB );
 
 		int exponent;
 	};
@@ -38,7 +45,10 @@ private:
 		NumericalFactor( double number );
 		virtual ~NumericalFactor( void );
 
+		virtual Type ReturnType( void ) const override;
 		virtual Factor* Clone( void ) const override;
+		virtual bool CombineWith( const Factor* factor ) override;
+		virtual bool IsOne( void ) const override;
 
 		double number;
 	};
@@ -50,7 +60,9 @@ private:
 		VariableFactor( const char* name );
 		virtual ~VariableFactor( void );
 
+		virtual Type ReturnType( void ) const override;
 		virtual Factor* Clone( void ) const override;
+		virtual bool CombineWith( const Factor* factor ) override;
 
 		char* name;
 	};
@@ -62,7 +74,9 @@ private:
 		InnerProductFactor( const char* vectorA, const char* vectorB );
 		virtual ~InnerProductFactor( void );
 
+		virtual Type ReturnType( void ) const override;
 		virtual Factor* Clone( void ) const override;
+		virtual bool CombineWith( const Factor* factor ) override;
 
 		char* vectorA;
 		char* vectorB;
@@ -81,7 +95,7 @@ private:
 		typedef List< Factor* > ProductOfFactors;
 		ProductOfFactors productOfFactors;
 
-		void CollectFactors( void );
+		void CombineFactors( void );
 	};
 
 	// An empty list is zero.
