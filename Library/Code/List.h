@@ -2,7 +2,7 @@
 
 #pragma once
 
-template< typename Data >
+template< class Data >
 class GACOMPUTE_API BlankDataManager
 {
 public:
@@ -12,7 +12,7 @@ public:
 	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
-template< typename Data >
+template< class Data >
 class GACOMPUTE_API DefaultDataManager
 {
 public:
@@ -22,7 +22,7 @@ public:
 	static int SortCompare( const Data& dataA, const Data& dataB );
 };
 
-template< typename Data, class DataManager = DefaultDataManager< Data > >
+template< class Data, class DataManager = DefaultDataManager< Data > >
 class GACOMPUTE_API List
 {
 public:
@@ -44,6 +44,9 @@ public:
 		Node* Next( void );
 		Node* Prev( void );
 
+		const Node* Next( void ) const;
+		const Node* Prev( void ) const;
+
 	private:
 
 		void Couple( Node* before, Node* after );
@@ -59,6 +62,9 @@ public:
 
 	Node* Head( void );
 	Node* Tail( void );
+
+	const Node* Head( void ) const;
+	const Node* Tail( void ) const;
 
 	Node* InsertBefore( Node* node = 0, Node* insertedNode = 0 );
 	Node* InsertAfter( Node* node = 0, Node* insertedNode = 0 );

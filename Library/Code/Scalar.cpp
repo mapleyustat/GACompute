@@ -44,8 +44,150 @@ bool Scalar::AssignInverse( const Scalar& scalar )
 	return false;
 }
 
+bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/, bool sortFactors /*= true*/ )
+{
+	if( combineFactors )
+	{
+		CombineFactors();
+
+		// This is ugly, but by just combining factors, we know
+		// that we have not changed the the given term in terms
+		// of algebraic equality.
+		const_cast< Term* >( term )->CombineFactors();
+	}
+
+	if( sortFactors )
+	{
+		productOfFactors.Sort( ProductOfFactors::SORT_ASCENDING );
+
+		// This is ugly, but we can't make the list order mutable
+		// without also making the list data mutable.
+		const_cast< Term* >( term )->productOfFactors.Sort( ProductOfFactors::SORT_ASCENDING );
+	}
+
+	ProductOfFactors* productOfFactorsA = &productOfFactors;
+	ProductOfFactors* productOfFactorsB = &const_cast< Term* >( term )->productOfFactors;
+
+	ProductOfFactors::Node* nodeA = productOfFactorsA->Head();
+	ProductOfFactors::Node* nodeB = productOfFactorsB->Head();
+
+	if( !nodeA || nodeA->data->ReturnType() != Factor::NUMERICAL )
+	{
+		nodeA = productOfFactorsA->InsertBefore();
+		nodeA->data = new NumericalFactor( 1.0 );
+	}
+
+	if( !nodeB || nodeB->data->ReturnType() != Factor::NUMERICAL )
+	{
+		nodeB = productOfFactorsB->InsertBefore();
+		nodeB->data = new NumericalFactor( 1.0 );
+	}
+
+	if( productOfFactorsA->Count() != productOfFactorsB->Count() )
+		return false;
+
+	while( nodeA && nodeB )
+	{
+		const Factor* factorA = nodeA->data;
+		const Factor* factorB = nodeB->data;
+
+		if( factorA->ReturnType() != factorB->ReturnType() )
+			return false;
+
+		if( factorA->exponent != factorB->exponent )
+			return false;
+
+		switch( nodeA->data->ReturnType() )
+		{
+			case Factor::VARIABLE:
+			{
+				const VariableFactor* variableFactorA = ( const VariableFactor* )factorA;
+				const VariableFactor* variableFactorB = ( const VariableFactor* )factorB;
+
+				if( 0 != strcmp( variableFactorA->name, variableFactorB->name ) )
+					return false;
+
+				break;
+			}
+			case Factor::INNER_PRODUCT:
+			{
+				const InnerProductFactor* innerProductFactorA = ( const InnerProductFactor* )factorA;
+				const InnerProductFactor* innerProductFactorB = ( const InnerProductFactor* )factorB;
+
+				// This works, because we sort vectors taken in the (commutative) inner product.
+
+				if( 0 != strcmp( innerProductFactorA->vectorA, innerProductFactorB->vectorA ) )
+					return false;
+
+				if( 0 != strcmp( innerProductFactorA->vectorB, innerProductFactorB->vectorB ) )
+					return false;
+
+				break;
+			}
+		}
+	}
+
+	nodeA = productOfFactorsA->Head();
+	nodeB = productOfFactorsB->Head();
+
+	NumericalFactor* numericalFactorA = ( NumericalFactor* )nodeA->data;
+	NumericalFactor* numericalFactorB = ( NumericalFactor* )nodeB->data;
+
+	numericalFactorA->number += numericalFactorB->number;
+
+	return true;
+}
+
 void Scalar::CollectTerms( void )
 {
+	CollectTerms( sumOfTermsNumerator );
+	CollectTerms( sumOfTermsDenominator );
+}
+
+void Scalar::CollectTerms( SumOfTerms& sumOfTerms )
+{
+	SumOfTerms::Node* node = sumOfTerms.Head();
+	while( node )
+	{
+		Term* term = node->data;
+
+		term->CombineFactors();
+		term->productOfFactors.Sort( Term::ProductOfFactors::SORT_ASCENDING );
+
+		node = node->Next();
+	}
+
+	SumOfTerms::Node* nodeA = sumOfTerms.Head();
+	while( nodeA )
+	{
+		Term* termA = nodeA->data;
+
+		SumOfTerms::Node* nodeB = nodeA->Next();
+		while( nodeB )
+		{
+			Term* termB = nodeB->data;
+
+			SumOfTerms::Node* nextNodeB = nodeB->Next();
+
+			if( termA->CombineWith( termB, false, false ) )
+				sumOfTerms.Remove( nodeB );
+
+			nodeB = nextNodeB;
+		}
+	}
+
+	nodeA = sumOfTerms.Head();
+	while( nodeA )
+	{
+		Term* termA = nodeA->data;
+
+		SumOfTerms::Node* nextNodeA = nodeA->Next();
+
+		if( termA->IsZero() )
+			sumOfTerms.Remove( nodeA );
+
+		nodeA = nextNodeA;
+	}
 }
 
 Scalar::Factor::Factor( void )
@@ -65,10 +207,10 @@ Scalar::Factor::Factor( void )
 	return false;
 }
 
-/*static*/ int Scalar::Factor::SortCompare( const Factor* factorA, const Factor* factorB )
+int Scalar::Factor::SortCompareWith( const Factor* factor ) const
 {
-	int typeA = factorA->ReturnType();
-	int typeB = factorB->ReturnType();
+	int typeA = ReturnType();
+	int typeB = factor->ReturnType();
 
 	if( typeA < typeB )
 		return -1;
@@ -116,6 +258,14 @@ Scalar::NumericalFactor::NumericalFactor( double number )
 	return false;
 }
 
+/*virtual*/ bool Scalar::NumericalFactor::IsZero( void ) const
+{
+	if( number == 0.0 )
+		return true;
+
+	return false;
+}
+
 Scalar::VariableFactor::VariableFactor( const char* name )
 {
 	int length = strlen( name ) + 1;
@@ -152,15 +302,29 @@ Scalar::VariableFactor::VariableFactor( const char* name )
 	return true;
 }
 
+/*virtual*/ bool Scalar::VariableFactor::IsZero( void ) const
+{
+	return false;
+}
+
 Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char* vectorB )
 {
-	int length = strlen( vectorA ) + 1;
-	this->vectorA = new char[ length ];
-	strcpy_s( this->vectorA, length, vectorA );
+	const char* firstVector = vectorA;
+	const char* secondVector = vectorB;
 
-	length = strlen( vectorB ) + 1;
+	if( strcmp( vectorA, vectorB ) > 0 )
+	{
+		firstVector = vectorB;
+		secondVector = vectorA;
+	}
+
+	int length = strlen( firstVector ) + 1;
+	this->vectorA = new char[ length ];
+	strcpy_s( this->vectorA, length, firstVector );
+
+	length = strlen( secondVector ) + 1;
 	this->vectorB = new char[ length ];
-	strcpy_s( this->vectorB, length, vectorB );
+	strcpy_s( this->vectorB, length, secondVector );
 }
 
 /*virtual*/ Scalar::InnerProductFactor::~InnerProductFactor( void )
@@ -194,6 +358,11 @@ Scalar::InnerProductFactor::InnerProductFactor( const char* vectorA, const char*
 
 	exponent += factor->exponent;
 	return true;
+}
+
+/*virtual*/ bool Scalar::InnerProductFactor::IsZero( void ) const
+{
+	return false;
 }
 
 Scalar::Term::Term( void )
@@ -248,6 +417,22 @@ void Scalar::Term::CombineFactors( void )
 
 		nodeA = nextNodeA;
 	}
+}
+
+bool Scalar::Term::IsZero( void ) const
+{
+	const ProductOfFactors::Node* node = productOfFactors.Head();
+	while( node )
+	{
+		Factor* factor = node->data;
+
+		if( factor->IsZero() )
+			return true;
+
+		node = node->Next();
+	}
+
+	return false;
 }
 
 // Scalar.cpp

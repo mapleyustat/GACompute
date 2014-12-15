@@ -32,8 +32,9 @@ private:
 		virtual Factor* Clone( void ) const = 0;
 		virtual bool CombineWith( const Factor* factor ) = 0;
 		virtual bool IsOne( void ) const;
+		virtual bool IsZero( void ) const = 0;
 
-		static int SortCompare( const Factor* factorA, const Factor* factorB );
+		int SortCompareWith( const Factor* factor ) const;
 
 		int exponent;
 	};
@@ -49,6 +50,7 @@ private:
 		virtual Factor* Clone( void ) const override;
 		virtual bool CombineWith( const Factor* factor ) override;
 		virtual bool IsOne( void ) const override;
+		virtual bool IsZero( void ) const override;
 
 		double number;
 	};
@@ -63,6 +65,7 @@ private:
 		virtual Type ReturnType( void ) const override;
 		virtual Factor* Clone( void ) const override;
 		virtual bool CombineWith( const Factor* factor ) override;
+		virtual bool IsZero( void ) const override;
 
 		char* name;
 	};
@@ -77,6 +80,7 @@ private:
 		virtual Type ReturnType( void ) const override;
 		virtual Factor* Clone( void ) const override;
 		virtual bool CombineWith( const Factor* factor ) override;
+		virtual bool IsZero( void ) const override;
 
 		char* vectorA;
 		char* vectorB;
@@ -91,6 +95,9 @@ private:
 
 		Term* Clone( void ) const;
 
+		bool CombineWith( const Term* term, bool combineFactors = true, bool sortFactors = true );
+		bool IsZero( void ) const;
+
 		// An empty list is one.
 		typedef List< Factor* > ProductOfFactors;
 		ProductOfFactors productOfFactors;
@@ -104,6 +111,7 @@ private:
 	SumOfTerms sumOfTermsDenominator;
 
 	void CollectTerms( void );
+	void CollectTerms( SumOfTerms& sumOfTerms );
 };
 
 // Scalar.h

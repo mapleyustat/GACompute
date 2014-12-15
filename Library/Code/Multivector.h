@@ -22,6 +22,8 @@ public:
 
 	void CalculateMagnitude( Scalar& scalar ) const;
 
+	//void Print( char* buffer, int bufferSize, bool latex ) const;
+
 private:
 
 	class Vector

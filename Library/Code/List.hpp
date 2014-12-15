@@ -1,53 +1,53 @@
 // List.hpp
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void BlankDataManager< Data >::Create( Data& data )
 {
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void BlankDataManager< Data >::Destroy( Data& data )
 {
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void BlankDataManager< Data >::Copy( Data& dataA, const Data& dataB )
 {
 	dataA = dataB;
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ int BlankDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
 {
 	return 0;
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void DefaultDataManager< Data >::Create( Data& data )
 {
 	data = 0;
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void DefaultDataManager< Data >::Destroy( Data& data )
 {
 	delete data;
 	data = 0;
 };
 
-template< typename Data >
+template< class Data >
 inline /*static*/ void DefaultDataManager< Data >::Copy( Data& dataA, const Data& dataB )
 {
 	dataA = dataB->Clone();
 }
 
-template< typename Data >
+template< class Data >
 inline /*static*/ int DefaultDataManager< Data >::SortCompare( const Data& dataA, const Data& dataB )
 {
-	return Data::SortCompare( dataA, dataB );
+	return dataA->SortCompareWith( dataB );
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline List< Data, DataManager >::List( void )
 {
 	count = 0;
@@ -56,13 +56,13 @@ inline List< Data, DataManager >::List( void )
 	tail = 0;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline List< Data, DataManager >::~List( void )
 {
 	RemoveAll();
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline List< Data, DataManager >::Node::Node( void )
 {
 	next = 0;
@@ -73,13 +73,13 @@ inline List< Data, DataManager >::Node::Node( void )
 	DataManager::Create( data );
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline List< Data, DataManager >::Node::~Node( void )
 {
 	DataManager::Destroy( data );
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline void List< Data, DataManager >::Node::Couple( Node* before, Node* after )
 {
 	before->next = this;
@@ -89,7 +89,7 @@ inline void List< Data, DataManager >::Node::Couple( Node* before, Node* after )
 	prev = before;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline void List< Data, DataManager >::Node::Decouple( void )
 {
 	if( next )
@@ -101,37 +101,61 @@ inline void List< Data, DataManager >::Node::Decouple( void )
 	prev = 0;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Node::Next( void )
 {
 	return next;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Node::Prev( void )
 {
 	return prev;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
+inline typename const List< Data, DataManager >::Node* List< Data, DataManager >::Node::Next( void ) const
+{
+	return next;
+}
+
+template< class Data, class DataManager >
+inline typename const List< Data, DataManager >::Node* List< Data, DataManager >::Node::Prev( void ) const
+{
+	return prev;
+}
+
+template< class Data, class DataManager >
 inline int List< Data, DataManager >::Count( void ) const
 {
 	return count;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Head( void )
 {
 	return head;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Tail( void )
 {
 	return tail;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
+inline typename const List< Data, DataManager >::Node* List< Data, DataManager >::Head( void ) const
+{
+	return head;
+}
+
+template< class Data, class DataManager >
+inline typename const List< Data, DataManager >::Node* List< Data, DataManager >::Tail( void ) const
+{
+	return tail;
+}
+
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::InsertBefore( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
@@ -156,7 +180,7 @@ inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Inse
 	return insertedNode;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline typename List< Data, DataManager >::Node* List< Data, DataManager >::InsertAfter( Node* node /*= 0*/, Node* insertedNode /*= 0*/ )
 {
 	if( !insertedNode )
@@ -181,7 +205,7 @@ inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Inse
 	return insertedNode;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline bool List< Data, DataManager >::Remove( Node* node, bool deleteNode /*= true*/ )
 {
 	if( node->list != this )
@@ -202,7 +226,7 @@ inline bool List< Data, DataManager >::Remove( Node* node, bool deleteNode /*= t
 	return true;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline bool List< Data, DataManager >::RemoveAll( void )
 {
 	while( count > 0 )
@@ -212,7 +236,7 @@ inline bool List< Data, DataManager >::RemoveAll( void )
 	return true;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline void List< Data, DataManager >::Absorb( List* list )
 {
 	if( count == 0 )
@@ -234,7 +258,7 @@ inline void List< Data, DataManager >::Absorb( List* list )
 	list->count = 0;
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline void List< Data, DataManager >::Concatinate( const List& list )
 {
 	const Node* node = list.head;
@@ -246,20 +270,20 @@ inline void List< Data, DataManager >::Concatinate( const List& list )
 	}
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline void List< Data, DataManager >::Copy( const List& list )
 {
 	RemoveAll();
 	Concatinate( list );
 }
 
-template< typename Data, class DataManager >
+template< class Data, class DataManager >
 inline int List< Data, DataManager >::Sort( SortOrder sortOrder )
 {
 	int adjacentSwapCount = 0;
 
 	bool keepGoing = true;
-	for( keepGoing )
+	while( keepGoing )
 	{
 		keepGoing = false;
 
@@ -275,7 +299,7 @@ inline int List< Data, DataManager >::Sort( SortOrder sortOrder )
 				Remove( node, false );
 				InsertAfter( next, node );
 
-				keepCount = true;
+				keepGoing = true;
 				adjacentSwapCount++;
 			}
 			else
