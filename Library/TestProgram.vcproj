@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="GACompute"
-	ProjectGUID="{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}"
-	RootNamespace="GACompute"
+	Name="TestProgram"
+	ProjectGUID="{E959E9E3-5F3E-4857-A5D3-E94486525B7B}"
+	RootNamespace="TestProgram"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,9 +20,9 @@
 			Name="Debug|Win32"
 			OutputDirectory="../Build/GACompute/$(ConfigurationName)"
 			IntermediateDirectory="../Build/GACompute/$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
-			BuildLogFile="../Build/GACompute/$(ConfigurationName)\BuildLog.htm"
+			BuildLogFile="../Build/GACompute/$(ConfigurationName)/BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;EXPORT_GACOMPUTE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -90,11 +90,12 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="../Build/GACompute/$(ConfigurationName)"
+			IntermediateDirectory="../Build/GACompute/$(ConfigurationName)"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
+			BuildLogFile="../Build/GACompute/$(ConfigurationName)/BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -115,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXPORT_GACOMPUTE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -135,7 +136,7 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -172,43 +173,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Code\BilinearForm.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\BilinearForm.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\GACompute.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\GACompute.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\List.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\List.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\Multivector.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\Multivector.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\Scalar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Code\Scalar.h"
+				RelativePath=".\Code\TestProgram.cpp"
 				>
 			</File>
 		</Filter>

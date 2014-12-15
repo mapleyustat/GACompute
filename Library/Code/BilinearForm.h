@@ -2,7 +2,7 @@
 
 #pragma once
 
-class GACompute::BilinearForm
+class GACOMPUTE_API GACompute::BilinearForm
 {
 public:
 

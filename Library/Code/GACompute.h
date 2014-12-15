@@ -2,6 +2,14 @@
 
 #pragma once
 
+#if defined EXPORT_GACOMPUTE
+#	define GACOMPUTE_API		__declspec( dllexport )
+#elif defined IMPORT_GACOMPUTE
+#	define GACOMPUTE_API		__declspec( dllimport )
+#else
+#	define GACOMPUTE_API
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

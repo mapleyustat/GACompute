@@ -2,7 +2,7 @@
 
 #pragma once
 
-class GACompute::Multivector
+class GACOMPUTE_API GACompute::Multivector
 {
 public:
 

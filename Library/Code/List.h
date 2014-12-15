@@ -3,7 +3,7 @@
 #pragma once
 
 template< typename Data >
-class BlankDataManager
+class GACOMPUTE_API BlankDataManager
 {
 public:
 	static void Create( Data& data );
@@ -13,7 +13,7 @@ public:
 };
 
 template< typename Data >
-class DefaultDataManager
+class GACOMPUTE_API DefaultDataManager
 {
 public:
 	static void Create( Data& data );
@@ -23,7 +23,7 @@ public:
 };
 
 template< typename Data, class DataManager = DefaultDataManager< Data > >
-class List
+class GACOMPUTE_API List
 {
 public:
 	

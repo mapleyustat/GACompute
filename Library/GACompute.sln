@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GACompute", "GACompute.vcproj", "{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestProgram", "TestProgram.vcproj", "{E959E9E3-5F3E-4857-A5D3-E94486525B7B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45} = {1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +18,10 @@ Global
 		{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}.Debug|Win32.Build.0 = Debug|Win32
 		{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}.Release|Win32.ActiveCfg = Release|Win32
 		{1EF3EE35-6CD1-4B8D-9F84-21489C5B2F45}.Release|Win32.Build.0 = Release|Win32
+		{E959E9E3-5F3E-4857-A5D3-E94486525B7B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E959E9E3-5F3E-4857-A5D3-E94486525B7B}.Debug|Win32.Build.0 = Debug|Win32
+		{E959E9E3-5F3E-4857-A5D3-E94486525B7B}.Release|Win32.ActiveCfg = Release|Win32
+		{E959E9E3-5F3E-4857-A5D3-E94486525B7B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

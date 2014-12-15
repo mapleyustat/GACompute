@@ -2,7 +2,7 @@
 
 #pragma once
 
-class GACompute::Scalar
+class GACOMPUTE_API GACompute::Scalar
 {
 public:
 
