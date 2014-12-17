@@ -146,18 +146,34 @@ bool Scalar::AssignProduct( const Scalar& scalarA, const Scalar& scalarB )
 
 bool Scalar::AssignInverse( const Scalar& scalar )
 {
-	CollectTerms();
-
-	if( sumOfTermsNumerator.Count() == 0 )
+	if( scalar.IsZero() )
 		return false;
 
-	SumOfTerms sumOfTermsTemporary;
+	if( this == &scalar )
+	{
+		SumOfTerms sumOfTermsTemporary;
 
-	sumOfTermsTemporary.Absorb( &sumOfTermsNumerator );
-	sumOfTermsNumerator.Absorb( &sumOfTermsDenominator );
-	sumOfTermsDenominator.Absorb( &sumOfTermsTemporary );
+		sumOfTermsTemporary.Absorb( &sumOfTermsNumerator );
+		sumOfTermsNumerator.Absorb( &sumOfTermsDenominator );
+		sumOfTermsDenominator.Absorb( &sumOfTermsTemporary );
+	}
+	else
+	{
+		sumOfTermsNumerator.Copy( scalar.sumOfTermsDenominator );
+		sumOfTermsDenominator.Copy( scalar.sumOfTermsNumerator );
+	}
 
 	return true;
+}
+
+bool Scalar::IsZero( void ) const
+{
+	const_cast< Scalar* >( this )->CollectTerms();
+
+	if( sumOfTermsNumerator.Count() == 0 )
+		return true;
+
+	return false;
 }
 
 bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/, bool sortFactors /*= true*/ )

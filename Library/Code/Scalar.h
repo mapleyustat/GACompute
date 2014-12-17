@@ -110,6 +110,8 @@ private:
 	SumOfTerms sumOfTermsNumerator;
 	SumOfTerms sumOfTermsDenominator;
 
+	bool IsZero( void ) const;
+
 	void CollectTerms( void );
 	void CollectTerms( SumOfTerms& sumOfTerms );
 
