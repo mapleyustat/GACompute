@@ -21,6 +21,8 @@ namespace GACompute
 	class Scalar;
 	class Multivector;
 	class BilinearForm;
+
+	enum PrintStyle { PRINT_NORMAL, PRINT_LATEX };
 }
 
 #include "Scalar.h"

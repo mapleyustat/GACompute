@@ -17,6 +17,8 @@ public:
 	bool AssignInnerProduct( const char* vectorA, const char* vectorB );
 	bool AssignInverse( const Scalar& scalar );
 
+	bool Print( char* buffer, int bufferSize, PrintStyle style ) const;
+
 private:
 
 	class Factor
@@ -33,6 +35,7 @@ private:
 		virtual bool CombineWith( const Factor* factor ) = 0;
 		virtual bool IsOne( void ) const;
 		virtual bool IsZero( void ) const = 0;
+		virtual bool Print( char* buffer, int bufferSize, PrintStyle style ) const = 0;
 
 		int SortCompareWith( const Factor* factor ) const;
 
@@ -51,6 +54,7 @@ private:
 		virtual bool CombineWith( const Factor* factor ) override;
 		virtual bool IsOne( void ) const override;
 		virtual bool IsZero( void ) const override;
+		virtual bool Print( char* buffer, int bufferSize, PrintStyle style ) const override;
 
 		double number;
 	};
@@ -66,6 +70,7 @@ private:
 		virtual Factor* Clone( void ) const override;
 		virtual bool CombineWith( const Factor* factor ) override;
 		virtual bool IsZero( void ) const override;
+		virtual bool Print( char* buffer, int bufferSize, PrintStyle style ) const override;
 
 		char* name;
 	};
@@ -81,6 +86,7 @@ private:
 		virtual Factor* Clone( void ) const override;
 		virtual bool CombineWith( const Factor* factor ) override;
 		virtual bool IsZero( void ) const override;
+		virtual bool Print( char* buffer, int bufferSize, PrintStyle style ) const override;
 
 		char* vectorA;
 		char* vectorB;
@@ -97,6 +103,8 @@ private:
 
 		bool CombineWith( const Term* term, bool combineFactors = true, bool sortFactors = true );
 		bool IsZero( void ) const;
+		bool IsOne( void ) const;
+		bool Print( char* buffer, int bufferSize, PrintStyle style ) const;
 
 		// An empty list is one.
 		typedef List< Factor* > ProductOfFactors;
@@ -117,6 +125,8 @@ private:
 
 	static void Multiply( SumOfTerms& sumOfTermsResult, const SumOfTerms& sumOfTermsA, const SumOfTerms& sumOfTermsB );
 	static Term* Multiply( const Term* termA, const Term* termB );
+
+	bool Print( char* buffer, int bufferSize, const SumOfTerms& sumOfTerms, PrintStyle style ) const;
 };
 
 // Scalar.h

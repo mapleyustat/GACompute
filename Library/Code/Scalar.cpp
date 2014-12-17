@@ -170,10 +170,215 @@ bool Scalar::IsZero( void ) const
 {
 	const_cast< Scalar* >( this )->CollectTerms();
 
+	if( sumOfTermsDenominator.Count() == 0 )
+		return false;
+
 	if( sumOfTermsNumerator.Count() == 0 )
 		return true;
 
 	return false;
+}
+
+bool Scalar::Print( char* buffer, int bufferSize, PrintStyle style ) const
+{
+	if( IsZero() )
+	{
+		strcpy_s( buffer, bufferSize, "0" );
+		return true;
+	}
+
+	if( sumOfTermsDenominator.Count() == 0 )
+	{
+		switch( style )
+		{
+			case PRINT_NORMAL:
+			{
+				strcpy_s( buffer, bufferSize, "inf" );
+				break;
+			}
+			case PRINT_LATEX:
+			{
+				strcpy_s( buffer, bufferSize, "\\inf" );
+				break;
+			}
+		}
+
+		return true;
+	}
+
+	if( sumOfTermsDenominator.Count() == 1 && sumOfTermsDenominator.Head()->data->IsOne() )
+		return Print( buffer, bufferSize, sumOfTermsNumerator, style );
+	
+	char numeratorBuffer[ 1024 ];
+	char denominatorBuffer[ 1024 ];
+
+	if( !Print( numeratorBuffer, sizeof( numeratorBuffer ), sumOfTermsNumerator, style ) )
+		return false;
+
+	if( !Print( denominatorBuffer, sizeof( denominatorBuffer ), sumOfTermsDenominator, style ) )
+		return false;
+
+	switch( style )
+	{
+		case PRINT_NORMAL:
+		{
+			if( sumOfTermsNumerator.Count() > 0 && sumOfTermsDenominator.Count() > 0 )
+				sprintf_s( buffer, bufferSize, "(%s)/(%s)", numeratorBuffer, denominatorBuffer );
+			else if( sumOfTermsNumerator.Count() > 0 )
+				sprintf_s( buffer, bufferSize, "(%s)/%s", numeratorBuffer, denominatorBuffer );
+			else if( sumOfTermsDenominator.Count() > 0 )
+				sprintf_s( buffer, bufferSize, "%s/(%s)", numeratorBuffer, denominatorBuffer );
+			else
+				sprintf_s( buffer, bufferSize, "%s/%s", numeratorBuffer, denominatorBuffer );
+			break;
+		}
+		case PRINT_LATEX:
+		{
+			sprintf_s( buffer, bufferSize, "\\frac{%s}{%s}", numeratorBuffer, denominatorBuffer );
+			break;
+		}
+	}
+
+	return true;
+}
+
+bool Scalar::Print( char* buffer, int bufferSize, const SumOfTerms& sumOfTerms, PrintStyle style ) const
+{
+	if( bufferSize <= 0 )
+		return false;
+
+	buffer[0] = '\0';
+
+	for( const SumOfTerms::Node* node = sumOfTerms.Head(); node; node = node->Next() )
+	{
+		Term* term = node->data;
+
+		char termBuffer[ 256 ];
+		if( !term->Print( termBuffer, sizeof( termBuffer ), style ) )
+			return false;
+
+		if( buffer[0] != '\0' )
+			strcat_s( buffer, bufferSize, " + " );
+
+		strcat_s( buffer, bufferSize, termBuffer );
+	}
+
+	return true;
+}
+
+bool Scalar::Term::Print( char* buffer, int bufferSize, PrintStyle style ) const
+{
+	if( bufferSize <= 0 )
+		return false;
+
+	if( IsOne() )
+	{
+		strcpy_s( buffer, bufferSize, "1" );
+		return true;
+	}
+
+	buffer[0] = '\0';
+
+	// Note that juxtaposition is unambiguous here, because all factors are combined.
+	// Otherwise, would "11" be eleven, or would it be 1*1=1?
+	for( const ProductOfFactors::Node* node = productOfFactors.Head(); node; node = node->Next() )
+	{
+		const Factor* factor = node->data;
+
+		char factorBuffer[ 128 ];
+		if( !factor->Print( factorBuffer, sizeof( factorBuffer ), style ) )
+			return false;
+
+		strcat_s( buffer, bufferSize, factorBuffer );
+	}
+
+	return true;
+}
+
+/*virtual*/ bool Scalar::NumericalFactor::Print( char* buffer, int bufferSize, PrintStyle style ) const
+{
+	if( exponent != 1 )
+		return false;
+
+	long rounded = long( number );
+	if( number == float( rounded ) )
+		sprintf_s( buffer, bufferSize, "%d", rounded );
+	else
+		sprintf_s( buffer, bufferSize, "%1.2f", number );
+
+	return true;
+}
+
+/*virtual*/ bool Scalar::VariableFactor::Print( char* buffer, int bufferSize, PrintStyle style ) const
+{
+	switch( style )
+	{
+		case PRINT_NORMAL:
+		{
+			if( strlen( name ) > 1 )
+			{
+				if( exponent != 1 )
+					sprintf_s( buffer, bufferSize, "(%s)^(%d)", name, exponent );
+				else
+					sprintf_s( buffer, bufferSize, "(%s)", name );
+			}
+			else
+			{
+				if( exponent != 1 )
+					sprintf_s( buffer, bufferSize, "%s^(%d)", name, exponent );
+				else
+					sprintf_s( buffer, bufferSize, "%s", name );
+			}
+
+			break;
+		}
+		case PRINT_LATEX:
+		{
+			if( strlen( name ) > 1 )
+			{
+				if( exponent != 1 )
+					sprintf_s( buffer, bufferSize, "(%s)^{%d}", name, exponent );
+				else
+					sprintf_s( buffer, bufferSize, "(%s)", name );
+			}
+			else
+			{
+				if( exponent != 1 )
+					sprintf_s( buffer, bufferSize, "%s^{%d}", name, exponent );
+				else
+					sprintf_s( buffer, bufferSize, "%s", name );
+			}
+
+			break;
+		}
+	}
+
+	return true;
+}
+
+/*virtual*/ bool Scalar::InnerProductFactor::Print( char* buffer, int bufferSize, PrintStyle style ) const
+{
+	switch( style )
+	{
+		case PRINT_NORMAL:
+		{
+			if( exponent != 1 )
+				sprintf_s( buffer, bufferSize, "(%s.%s)^(%d)", vectorA, vectorB, exponent );
+			else
+				sprintf_s( buffer, bufferSize, "(%s.%s)", vectorA, vectorB );
+			break;
+		}
+		case PRINT_LATEX:
+		{
+			if( exponent != 1 )
+				sprintf_s( buffer, bufferSize, "(%s\\cdot %s)^{%d}", vectorA, vectorB, exponent );
+			else
+				sprintf_s( buffer, bufferSize, "(%s\\cdot %s)", vectorA, vectorB );
+			break;
+		}
+	}
+
+	return true;
 }
 
 bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/, bool sortFactors /*= true*/ )
@@ -563,6 +768,16 @@ bool Scalar::Term::IsZero( void ) const
 
 		node = node->Next();
 	}
+
+	return false;
+}
+
+bool Scalar::Term::IsOne( void ) const
+{
+	const_cast< Term* >( this )->CombineFactors();
+
+	if( productOfFactors.Count() == 0 )
+		return true;
 
 	return false;
 }
