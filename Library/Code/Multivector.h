@@ -9,20 +9,20 @@ public:
 	Multivector( void );
 	~Multivector( void );
 
-	void Assign( const Multivector& multivector );
-	void AssignScalar( const Scalar& scalar );
-	void AssignVector( const char* name );
-	void AssignSum( const Multivector& multivectorA, const Multivector& multivectorB );
-	void AssignScalarProduct( const Multivector& multivector, const Scalar& scalar );
-	void AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB );
-	void AssignOuterProduct( const Multivector& multivectorA, const Multivector& multivectorB );
-	void AssignGeometricProduct( const Multivector& multivectorA, const Multivector& multivectorB );
-	void AssignReverse( const Multivector& multivector );
+	bool Assign( const Multivector& multivector );
+	bool AssignScalar( const Scalar& scalar );
+	bool AssignVector( const char* name );
+	bool AssignSum( const Multivector& multivectorA, const Multivector& multivectorB );
+	bool AssignScalarProduct( const Multivector& multivector, const Scalar& scalar );
+	bool AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB );
+	bool AssignOuterProduct( const Multivector& multivectorA, const Multivector& multivectorB );
+	bool AssignGeometricProduct( const Multivector& multivectorA, const Multivector& multivectorB );
+	bool AssignReverse( const Multivector& multivector );
 	bool AssignInverse( const Multivector& multivector );
 
-	void CalculateMagnitude( Scalar& scalar ) const;
+	bool CalculateMagnitude( Scalar& scalar ) const;
 
-	//void Print( char* buffer, int bufferSize, bool latex ) const;
+	//void Print( char* buffer, int bufferSize, PrintStyle style ) const;
 
 private:
 
@@ -61,11 +61,11 @@ private:
 	typedef List< Term* > SumOfTerms;
 	SumOfTerms sumOfTerms;
 
-	void CollectTerms( void );
+	bool CollectTerms( Term::ProductType productType );
 
-	void TransformTerms( Term::ProductType productType );
+	bool Multiply( const Multivector& multivectorA, const Multivector& multivectorB, Term::ProductType productType );
 
-	void AssignTerm( const Term& term, Term::ProductType productType );
+	int CountProductTypes( Term::ProductType productType ) const;
 };
 
 // Multivector.h
