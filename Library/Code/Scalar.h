@@ -19,6 +19,11 @@ public:
 
 	bool Print( char* buffer, int bufferSize, PrintStyle style ) const;
 
+	bool IsZero( void ) const;
+	bool IsOne( void ) const;
+
+	bool CollectTerms( void );
+
 private:
 
 	class Factor
@@ -118,10 +123,7 @@ private:
 	SumOfTerms sumOfTermsNumerator;
 	SumOfTerms sumOfTermsDenominator;
 
-	bool IsZero( void ) const;
-
-	void CollectTerms( void );
-	void CollectTerms( SumOfTerms& sumOfTerms );
+	bool CollectTerms( SumOfTerms& sumOfTerms );
 
 	static void Multiply( SumOfTerms& sumOfTermsResult, const SumOfTerms& sumOfTermsA, const SumOfTerms& sumOfTermsB );
 	static Term* Multiply( const Term* termA, const Term* termB );

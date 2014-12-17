@@ -19,7 +19,10 @@ bool Scalar::Assign( double number )
 	sumOfTermsDenominator.RemoveAll();
 
 	Term* term = new Term();
-	term->productOfFactors.InsertAfter()->data = new NumericalFactor( number );
+
+	if( number != 1.0 )
+		term->productOfFactors.InsertAfter()->data = new NumericalFactor( number );
+
 	sumOfTermsNumerator.InsertAfter()->data = term;
 
 	sumOfTermsDenominator.InsertAfter()->data = new Term();
@@ -177,6 +180,23 @@ bool Scalar::IsZero( void ) const
 		return true;
 
 	return false;
+}
+
+bool Scalar::IsOne( void ) const
+{
+	const_cast< Scalar* >( this )->CollectTerms();
+
+	if( sumOfTermsDenominator.Count() == 0 )
+		return false;
+
+	if( sumOfTermsNumerator.Count() != 1 )
+		return false;
+
+	Term* term = sumOfTermsNumerator.Head()->data;
+	if( !term->IsOne() )
+		return false;
+
+	return true;
 }
 
 bool Scalar::Print( char* buffer, int bufferSize, PrintStyle style ) const
@@ -475,13 +495,18 @@ bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/
 	return true;
 }
 
-void Scalar::CollectTerms( void )
+bool Scalar::CollectTerms( void )
 {
-	CollectTerms( sumOfTermsNumerator );
-	CollectTerms( sumOfTermsDenominator );
+	if( !CollectTerms( sumOfTermsNumerator ) )
+		return false;
+
+	if( !CollectTerms( sumOfTermsDenominator ) )
+		return false;
+
+	return true;
 }
 
-void Scalar::CollectTerms( SumOfTerms& sumOfTerms )
+bool Scalar::CollectTerms( SumOfTerms& sumOfTerms )
 {
 	SumOfTerms::Node* node = sumOfTerms.Head();
 	while( node )
@@ -525,6 +550,8 @@ void Scalar::CollectTerms( SumOfTerms& sumOfTerms )
 
 		nodeA = nextNodeA;
 	}
+
+	return true;
 }
 
 Scalar::Factor::Factor( void )

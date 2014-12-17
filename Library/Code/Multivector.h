@@ -42,10 +42,14 @@ private:
 	{
 	public:
 
-		Term( void );
+		enum ProductType { GEOMETRIC_PRODUCT, OUTER_PRODUCT };
+
+		Term( ProductType productType, Scalar* coeficient = 0 );
 		~Term( void );
 
 		Term* Clone( void ) const;
+
+		int Grade( void ) const;
 
 		Scalar* coeficient;
 
@@ -53,8 +57,12 @@ private:
 		typedef List< Vector* > ProductOfVectors;
 		ProductOfVectors productOfVectors;
 
-		enum ProductType { GEOMETRIC_PRODUCT, OUTER_PRODUCT };
 		ProductType productType;
+
+		static ProductType OtherProductType( ProductType productType );
+
+		// Note that in the interest of efficiency, this method is distructive to this term.
+		bool PerformProductMorphism( Multivector& multivector );
 	};
 
 	// An empty list is zero.
@@ -63,7 +71,21 @@ private:
 
 	bool CollectTerms( Term::ProductType productType );
 
+	bool IsHomogeneousOfProductType( Term::ProductType productType ) const;
+	bool IsHomogeneousOfGrade( int grade ) const;
+
+	SumOfTerms::Node* FindTermOfProductType( Term::ProductType productType );
+
+	// This performs the desired product between the two given multivectors.
 	bool Multiply( const Multivector& multivectorA, const Multivector& multivectorB, Term::ProductType productType );
+
+	// These perform the named product, expecting the given multivector to be homogeneous of the given product type.
+	bool OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
+	bool OuterProductMultiply( const Multivector& multivectorA, const Vector& vectorB, Term::ProductType homogeneousProductType );
+	bool InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
+	bool InnerProductMultiply( const Multivector& multivectorA, const Vector& vectorB, Term::ProductType homogeneousProductType );
+	bool GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
+	bool GeometricProductMultiply( const Multivector& multivectorA, const Vector& vectorA, Term::ProductType homogeneousProductType );
 
 	int CountProductTypes( Term::ProductType productType ) const;
 };
