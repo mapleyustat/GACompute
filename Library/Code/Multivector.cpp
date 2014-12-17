@@ -303,22 +303,7 @@ bool Multivector::OuterProductMultiply( const Vector& vectorA, const Multivector
 }
 
 // Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::OuterProductMultiply( const Multivector& multivectorA, const Vector& vectorB, Term::ProductType homogeneousProductType )
-{
-	if( homogeneousProductType == Term::GEOMETRIC_PRODUCT )
-		return false;		// Not yet supported.  (Could write it in terms of other functions.)
-
-	return true;
-}
-
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
 bool Multivector::InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType )
-{
-	return false;
-}
-
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::InnerProductMultiply( const Multivector& multivectorA, const Vector& vectorB, Term::ProductType homogeneousProductType )
 {
 	return false;
 }
@@ -326,12 +311,9 @@ bool Multivector::InnerProductMultiply( const Multivector& multivectorA, const V
 // Note that we accumulate into this multivector and fail if not all terms are of the given type.
 bool Multivector::GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType )
 {
-	return false;
-}
+	if( homogeneousProductType == Term::OUTER_PRODUCT )
+		return false;		// Not yet supported.  (Could write it in terms of other functions.)
 
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::GeometricProductMultiply( const Multivector& multivectorA, const Vector& vectorA, Term::ProductType homogeneousProductType )
-{
 	return false;
 }
 
