@@ -9,12 +9,12 @@ public:
 	Scalar( void );
 	~Scalar( void );
 
-	void Assign( double number );
-	void Assign( const char* variable );
-	void Assign( const Scalar& scalar );
-	void AssignSum( const Scalar& scalarA, const Scalar& scalarB );
-	void AssignProduct( const Scalar& scalarA, const Scalar& scalarB );
-	void AssignInnerProduct( const char* vectorA, const char* vectorB );
+	bool Assign( double number );
+	bool Assign( const char* variable );
+	bool Assign( const Scalar& scalar );
+	bool AssignSum( const Scalar& scalarA, const Scalar& scalarB );
+	bool AssignProduct( const Scalar& scalarA, const Scalar& scalarB );
+	bool AssignInnerProduct( const char* vectorA, const char* vectorB );
 	bool AssignInverse( const Scalar& scalar );
 
 private:
@@ -112,6 +112,9 @@ private:
 
 	void CollectTerms( void );
 	void CollectTerms( SumOfTerms& sumOfTerms );
+
+	static void Multiply( SumOfTerms& sumOfTermsResult, const SumOfTerms& sumOfTermsA, const SumOfTerms& sumOfTermsB );
+	static Term* Multiply( const Term* termA, const Term* termB );
 };
 
 // Scalar.h

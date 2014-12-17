@@ -13,35 +13,151 @@ Scalar::~Scalar( void )
 {
 }
 
-void Scalar::Assign( double number )
+bool Scalar::Assign( double number )
 {
+	sumOfTermsNumerator.RemoveAll();
+	sumOfTermsDenominator.RemoveAll();
+
+	Term* term = new Term();
+	term->productOfFactors.InsertAfter()->data = new NumericalFactor( number );
+	sumOfTermsNumerator.InsertAfter()->data = term;
+
+	sumOfTermsDenominator.InsertAfter()->data = new Term();
+
+	return true;
 }
 
-void Scalar::Assign( const char* variable )
+bool Scalar::Assign( const char* variable )
 {
+	sumOfTermsNumerator.RemoveAll();
+	sumOfTermsDenominator.RemoveAll();
+
+	Term* term = new Term();
+	term->productOfFactors.InsertAfter()->data = new VariableFactor( variable );
+	sumOfTermsNumerator.InsertAfter()->data = term;
+
+	sumOfTermsDenominator.InsertAfter()->data = new Term();
+
+	return true;
 }
 
-void Scalar::Assign( const Scalar& scalar )
+bool Scalar::AssignInnerProduct( const char* vectorA, const char* vectorB )
+{
+	sumOfTermsNumerator.RemoveAll();
+	sumOfTermsDenominator.RemoveAll();
+
+	Term* term = new Term();
+	term->productOfFactors.InsertAfter()->data = new InnerProductFactor( vectorA, vectorB );
+	sumOfTermsNumerator.InsertAfter()->data = term;
+
+	sumOfTermsDenominator.InsertAfter()->data = new Term();
+
+	return true;
+}
+
+bool Scalar::Assign( const Scalar& scalar )
 {
 	sumOfTermsNumerator.Copy( scalar.sumOfTermsNumerator );
 	sumOfTermsDenominator.Copy( scalar.sumOfTermsDenominator );
+
+	return true;
 }
 
-void Scalar::AssignSum( const Scalar& scalarA, const Scalar& scalarB )
+bool Scalar::AssignSum( const Scalar& scalarA, const Scalar& scalarB )
 {
+	Scalar* scalarResult = this;
+
+	Scalar scalarStorage;
+	if( this == &scalarA || this == &scalarB )
+		scalarResult = &scalarStorage;
+
+	scalarResult->sumOfTermsNumerator.RemoveAll();
+	Multiply( scalarResult->sumOfTermsNumerator, scalarA.sumOfTermsNumerator, scalarB.sumOfTermsDenominator );
+	Multiply( scalarResult->sumOfTermsNumerator, scalarB.sumOfTermsNumerator, scalarA.sumOfTermsDenominator );
+
+	scalarResult->sumOfTermsDenominator.RemoveAll();
+	Multiply( scalarResult->sumOfTermsDenominator, scalarA.sumOfTermsDenominator, scalarB.sumOfTermsDenominator );
+
+	scalarResult->CollectTerms();
+
+	if( scalarResult == &scalarStorage )
+		return Assign( scalarStorage );
+
+	return true;
 }
 
-void Scalar::AssignProduct( const Scalar& scalarA, const Scalar& scalarB )
+bool Scalar::AssignProduct( const Scalar& scalarA, const Scalar& scalarB )
 {
+	Scalar* scalarResult = this;
+
+	Scalar scalarStorage;
+	if( this == &scalarA || this == &scalarB )
+		scalarResult = &scalarStorage;
+
+	scalarResult->sumOfTermsNumerator.RemoveAll();
+	Multiply( scalarResult->sumOfTermsNumerator, scalarA.sumOfTermsNumerator, scalarB.sumOfTermsNumerator );
+
+	scalarResult->sumOfTermsDenominator.RemoveAll();
+	Multiply( scalarResult->sumOfTermsDenominator, scalarA.sumOfTermsDenominator, scalarB.sumOfTermsDenominator );
+
+	scalarResult->CollectTerms();
+
+	if( scalarResult == &scalarStorage )
+		return Assign( scalarStorage );
+
+	return true;
 }
 
-void Scalar::AssignInnerProduct( const char* vectorA, const char* vectorB )
+// Note that we accumulate into the given result sum.
+/*static*/ void Scalar::Multiply( SumOfTerms& sumOfTermsResult, const SumOfTerms& sumOfTermsA, const SumOfTerms& sumOfTermsB )
 {
+	for( const SumOfTerms::Node* nodeA = sumOfTermsA.Head(); nodeA; nodeA = nodeA->Next() )
+	{
+		const Term* termA = nodeA->data;
+
+		for( const SumOfTerms::Node* nodeB = sumOfTermsB.Head(); nodeB; nodeB = nodeB->Next() )
+		{
+			const Term* termB = nodeB->data;
+
+			Term* termProduct = Multiply( termA, termB );
+			sumOfTermsResult.InsertAfter()->data = termProduct;
+		}
+	}
+}
+
+/*static*/ Scalar::Term* Scalar::Multiply( const Term* termA, const Term* termB )
+{
+	Term* termProduct = new Term();
+
+	for( const Term::ProductOfFactors::Node* node = termA->productOfFactors.Head(); node; node = node->Next() )
+	{
+		Factor* factor = node->data;
+		termProduct->productOfFactors.InsertAfter()->data = factor->Clone();
+	}
+
+	for( const Term::ProductOfFactors::Node* node = termB->productOfFactors.Head(); node; node = node->Next() )
+	{
+		Factor* factor = node->data;
+		termProduct->productOfFactors.InsertAfter()->data = factor->Clone();
+	}
+
+	return termProduct;
 }
 
 bool Scalar::AssignInverse( const Scalar& scalar )
 {
-	return false;
+	CollectTerms();
+
+	if( sumOfTermsNumerator.Count() == 0 )
+		return false;
+
+	SumOfTerms sumOfTermsTemporary;
+
+	sumOfTermsTemporary.Absorb( &sumOfTermsNumerator );
+	sumOfTermsNumerator.Absorb( &sumOfTermsDenominator );
+	sumOfTermsDenominator.Absorb( &sumOfTermsTemporary );
+
+	return true;
 }
 
 bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/, bool sortFactors /*= true*/ )
