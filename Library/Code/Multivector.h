@@ -13,7 +13,7 @@ public:
 	bool AssignScalar( const Scalar& scalar );
 	bool AssignVector( const char* name );
 	bool AssignSum( const Multivector& multivectorA, const Multivector& multivectorB );
-	bool AssignScalarProduct( const Multivector& multivector, const Scalar& scalar );
+	bool AssignScalarProduct( const Scalar& scalarB, const Multivector& multivectorA );
 	bool AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignOuterProduct( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignGeometricProduct( const Multivector& multivectorA, const Multivector& multivectorB );
@@ -35,6 +35,8 @@ private:
 
 		Vector* Clone( void ) const;
 
+		int SortCompareWith( const Vector* vector ) const;
+
 		char* name;
 	};
 
@@ -50,6 +52,9 @@ private:
 		Term* Clone( void ) const;
 
 		int Grade( void ) const;
+
+		bool CombineWith( const Term* term, bool sortVectors = true );
+		bool SortProduct( void );
 
 		Scalar* coeficient;
 

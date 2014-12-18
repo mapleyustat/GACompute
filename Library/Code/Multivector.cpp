@@ -34,7 +34,7 @@ bool Multivector::AssignSum( const Multivector& multivectorA, const Multivector&
 	return true;
 }
 
-bool Multivector::AssignScalarProduct( const Multivector& multivector, const Scalar& scalar )
+bool Multivector::AssignScalarProduct( const Scalar& scalarB, const Multivector& multivectorA )
 {
 	return true;
 }
@@ -145,6 +145,11 @@ Multivector::Vector* Multivector::Vector::Clone( void ) const
 	return new Vector( name );
 }
 
+int Multivector::Vector::SortCompareWith( const Vector* vector ) const
+{
+	return strcmp( name, vector->name );
+}
+
 Multivector::Term::Term( ProductType productType, Scalar* coeficient /*= 0*/ )
 {
 	this->productType = productType;
@@ -208,7 +213,68 @@ bool Multivector::CollectTerms( Term::ProductType productType )
 		sumOfTerms.Absorb( &multivector.sumOfTerms );
 	}
 
-	//...
+	if( productType == Term::OUTER_PRODUCT )
+	{
+		// STPTODO: Presort all term products, accounting for the sign change.  This way we can use CombineWidth( ..., false ) to save time.
+	}
+
+	// STPTODO: Combine terms here.
+
+	// STPTODO: Cull zero terms here.
+
+	return true;
+}
+
+bool Multivector::Term::CombineWith( const Term* term, bool sortVectors /*= true*/ )
+{
+	if( productType != term->productType )
+		return false;
+
+	if( productOfVectors.Count() != term->productOfVectors.Count() )
+		return false;
+
+	if( sortVectors )
+	{
+		SortProduct();
+
+		const_cast< Term* >( term )->SortProduct();
+	}
+
+	ProductOfVectors* productOfVectorsA = &productOfVectors;
+	ProductOfVectors* productOfVectorsB = &const_cast< Term* >( term )->productOfVectors;
+
+	ProductOfVectors::Node* nodeA = productOfVectorsA->Head();
+	ProductOfVectors::Node* nodeB = productOfVectorsB->Head();
+
+	while( nodeA && nodeB )
+	{
+		Vector* vectorA = nodeA->data;
+		Vector* vectorB = nodeB->data;
+
+		if( 0 != strcmp( vectorA->name, vectorB->name ) )
+			return false;
+
+		nodeA = nodeA->Next();
+		nodeB = nodeB->Next();
+	}
+
+	if( !coeficient->AssignSum( *coeficient, *term->coeficient ) )
+		return false;
+
+	return true;
+}
+
+bool Multivector::Term::SortProduct( void )
+{
+	if( productType == GEOMETRIC_PRODUCT )
+		return false;
+
+	int adjacentSwapCount = productOfVectors.Sort( ProductOfVectors::SORT_ASCENDING );
+
+	if( adjacentSwapCount % 2 )
+	{
+		// STPTODO: Negate the coeficient here.
+	}
 
 	return true;
 }

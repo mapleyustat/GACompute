@@ -482,6 +482,9 @@ bool Scalar::Term::CombineWith( const Term* term, bool combineFactors /*= true*/
 				break;
 			}
 		}
+
+		nodeA = nodeA->Next();
+		nodeB = nodeB->Next();
 	}
 
 	nodeA = productOfFactorsA->Head();
