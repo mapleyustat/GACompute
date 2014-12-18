@@ -54,8 +54,6 @@ public:
 
 		Node* next;
 		Node* prev;
-
-		List* list;
 	};
 
 	int Count( void ) const;

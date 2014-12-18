@@ -149,22 +149,74 @@ bool Scalar::AssignProduct( const Scalar& scalarA, const Scalar& scalarB )
 
 bool Scalar::AssignInverse( const Scalar& scalar )
 {
-	if( scalar.IsZero() )
-		return false;
-
 	if( this == &scalar )
-	{
-		SumOfTerms sumOfTermsTemporary;
-
-		sumOfTermsTemporary.Absorb( &sumOfTermsNumerator );
-		sumOfTermsNumerator.Absorb( &sumOfTermsDenominator );
-		sumOfTermsDenominator.Absorb( &sumOfTermsTemporary );
-	}
+		return Invert();
 	else
 	{
+		if( scalar.IsZero() )
+			return false;
+
 		sumOfTermsNumerator.Copy( scalar.sumOfTermsDenominator );
 		sumOfTermsDenominator.Copy( scalar.sumOfTermsNumerator );
 	}
+
+	return true;
+}
+
+bool Scalar::Negate( void )
+{
+	return Scale( -1.0 );
+}
+
+bool Scalar::Scale( double number )
+{
+	if( IsZero() )
+		return true;
+
+	for( SumOfTerms::Node* node = sumOfTermsNumerator.Head(); node; node = node->Next() )
+	{
+		Term* term = node->data;
+		if( term->IsZero() )
+			continue;
+
+		NumericalFactor* numericalFactor = ( NumericalFactor* )term->FindTermOfFactorType( Factor::NUMERICAL );
+		if( !numericalFactor )
+		{
+			numericalFactor = new NumericalFactor( 1.0 );
+			term->productOfFactors.InsertBefore()->data = numericalFactor;
+		}
+
+		numericalFactor->number *= number;
+	}
+
+	return true;
+}
+
+Scalar::Term::ProductOfFactors::Node* Scalar::Term::FindTermOfFactorType( Factor::Type factorType )
+{
+	ProductOfFactors::Node* node = productOfFactors.Head();
+	while( node )
+	{
+		Factor* factor = node->data;
+		if( factor->ReturnType() == factorType )
+			break;
+
+		node = node->Next();
+	}
+
+	return node;
+}
+
+bool Scalar::Invert( void )
+{
+	if( IsZero() )
+		return false;
+
+	SumOfTerms sumOfTermsTemporary;
+
+	sumOfTermsTemporary.Absorb( &sumOfTermsNumerator );
+	sumOfTermsNumerator.Absorb( &sumOfTermsDenominator );
+	sumOfTermsDenominator.Absorb( &sumOfTermsTemporary );
 
 	return true;
 }

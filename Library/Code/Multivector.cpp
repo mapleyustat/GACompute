@@ -14,33 +14,143 @@ Multivector::~Multivector( void )
 
 bool Multivector::Assign( const Multivector& multivector )
 {
-	sumOfTerms.Copy( multivector.sumOfTerms );
+	if( this == &multivector )
+		return true;
 
+	sumOfTerms.Copy( multivector.sumOfTerms );
 	return true;
 }
 
 bool Multivector::AssignScalar( const Scalar& scalar )
 {
+	//...
 	return true;
 }
 
 bool Multivector::AssignVector( const char* name )
 {
+	//...
 	return true;
 }
 
 bool Multivector::AssignSum( const Multivector& multivectorA, const Multivector& multivectorB )
 {
+	if( this == &multivectorA && this == &multivectorB )
+	{
+		Scalar scalarTwo;
+		if( !scalarTwo.Assign( 2.0 ) )
+			return false;
+
+		if( !AssignScalarProduct( scalarTwo, *this ) )
+			return false;
+
+		return true;
+	}
+	
+	bool accumulateA = true;
+	bool accumulateB = true;
+
+	if( this == &multivectorA )
+		accumulateA = false;
+	else if( this == &multivectorB )
+		accumulateB = false;
+	else
+		sumOfTerms.RemoveAll();
+
+	if( accumulateA )
+	{
+		for( const SumOfTerms::Node* node = multivectorA.sumOfTerms.Head(); node; node = node->Next() )
+		{
+			const Term* term = node->data;
+			sumOfTerms.InsertAfter()->data = term->Clone();
+		}
+	}
+
+	if( accumulateB )
+	{
+		for( const SumOfTerms::Node* node = multivectorB.sumOfTerms.Head(); node; node = node->Next() )
+		{
+			const Term* term = node->data;
+			sumOfTerms.InsertAfter()->data = term->Clone();
+		}
+	}
+
+	if( !CollectTerms( Term::OUTER_PRODUCT ) )
+		return false;
+
 	return true;
 }
 
-bool Multivector::AssignScalarProduct( const Scalar& scalarB, const Multivector& multivectorA )
+bool Multivector::AssignScalarProduct( const Scalar& scalarA, const Multivector& multivectorB )
 {
+	if( this != &multivectorB )
+	{
+		if( !Assign( multivectorB ) )
+			return false;
+	}
+
+	for( SumOfTerms::Node* node = sumOfTerms.Head(); node; node = node->Next() )
+	{
+		Term* term = node->data;
+		if( !term->coeficient->AssignProduct( scalarA, *term->coeficient ) )
+			return false;
+	}
+
 	return true;
 }
 
 bool Multivector::AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB )
 {
+	if( multivectorA.CountProductTypes( Term::GEOMETRIC_PRODUCT ) > 0 )
+		if( !const_cast< Multivector* >( &multivectorA )->CollectTerms( Term::OUTER_PRODUCT ) )
+			return false;
+
+	if( multivectorB.CountProductTypes( Term::GEOMETRIC_PRODUCT ) > 0 )
+		if( !const_cast< Multivector* >( &multivectorB )->CollectTerms( Term::OUTER_PRODUCT ) )
+			return false;
+
+	Multivector* multivectorResult = this;
+
+	Multivector multivectorStorage;
+	if( this == &multivectorA || this == &multivectorB )
+		multivectorResult = &multivectorStorage;
+
+	for( const SumOfTerms::Node* nodeA = multivectorA.sumOfTerms.Head(); nodeA; nodeA = nodeA->Next() )
+	{
+		const Term* termA = nodeA->data;
+
+		for( const SumOfTerms::Node* nodeB = multivectorB.sumOfTerms.Head(); nodeB; nodeB = nodeB->Next() )
+		{
+			const Term* termB = nodeB->data;
+
+			Multivector innerProductMultivector;
+			if( !termA->InnerProductMultiply( termB, innerProductMultivector ) )
+				return false;
+
+			Scalar scalar;
+			if( !scalar.AssignProduct( *termA->coeficient, *termB->coeficient ) )
+				return false;
+
+			if( !innerProductMultivector.AssignScalarProduct( scalar, innerProductMultivector ) )
+				return false;
+
+			multivectorResult->sumOfTerms.Absorb( &innerProductMultivector.sumOfTerms );
+		}
+	}
+
+	if( multivectorResult == &multivectorStorage )
+		return Assign( multivectorStorage );
+
+	return true;
+}
+
+bool Multivector::Term::InnerProductMultiply( const Term* term, Multivector& multivector ) const
+{
+	if( productType != OUTER_PRODUCT || term->productType != OUTER_PRODUCT )
+		return false;
+
+	//...
+
 	return true;
 }
 
@@ -115,17 +225,56 @@ bool Multivector::Multiply( const Multivector& multivectorA, const Multivector& 
 
 bool Multivector::AssignReverse( const Multivector& multivector )
 {
-	return true;
+	if( this != &multivector )
+		if( !Assign( multivector ) )
+			return false;
+
+	return Reverse();
 }
 
 bool Multivector::AssignInverse( const Multivector& multivector )
 {
+	// STPTODO: This is not a trivial problem.  It amounts to seting up and solving a linear system of equations.
+	//          With symbolic variables in the mix, this makes it even less trivial.
 	return false;
+}
+
+bool Multivector::Negate( void )
+{
+	return Scale( -1.0 );
+}
+
+bool Multivector::Scale( double number )
+{
+	for( SumOfTerms::Node* node = sumOfTerms.Head(); node; node = node->Next() )
+	{
+		Term* term = node->data;
+		if( !term->coeficient->Scale( number ) )
+			return false;
+	}
+
+	return true;
+}
+
+bool Multivector::Reverse( void )
+{
+	if( !CollectTerms( Term::GEOMETRIC_PRODUCT ) )
+		return false;
+
+	for( SumOfTerms::Node* node = sumOfTerms.Head(); node; node = node->Next() )
+	{
+		Term* term = node->data;
+		if( !term->Reverse() )
+			return false;
+	}
+
+	return true;
 }
 
 bool Multivector::CalculateMagnitude( Scalar& scalar ) const
 {
-	return true;
+	//...
+	return false;
 }
 
 Multivector::Vector::Vector( const char* name )
@@ -155,7 +304,8 @@ Multivector::Term::Term( ProductType productType, Scalar* coeficient /*= 0*/ )
 	this->productType = productType;
 	this->coeficient = new Scalar();
 
-	// STPTODO: We might provide an option here to take over the given scalar memory, since copying the scalar could be expensive.
+	// STPTODO: We might provide an option here to take over the given scalar memory,
+	//          since copying the scalar could be expensive.
 
 	if( coeficient )
 		this->coeficient->Assign( *coeficient );
@@ -174,6 +324,25 @@ Multivector::Term* Multivector::Term::Clone( void ) const
 	clonedTerm->productOfVectors.Copy( productOfVectors );
 
 	return clonedTerm;
+}
+
+bool Multivector::Term::Reverse( void )
+{
+	if( productType != GEOMETRIC_PRODUCT )
+		return false;
+
+	ProductOfVectors reverseProduct;
+
+	while( productOfVectors.Count() > 0 )
+	{
+		ProductOfVectors::Node* node = productOfVectors.Head();
+		productOfVectors.Remove( node, false );
+		reverseProduct.InsertBefore( 0, node );
+	}
+
+	productOfVectors.Absorb( &reverseProduct );
+
+	return true;
 }
 
 Multivector::SumOfTerms::Node* Multivector::FindTermOfProductType( Term::ProductType productType )
@@ -270,11 +439,8 @@ bool Multivector::Term::SortProduct( void )
 		return false;
 
 	int adjacentSwapCount = productOfVectors.Sort( ProductOfVectors::SORT_ASCENDING );
-
 	if( adjacentSwapCount % 2 )
-	{
-		// STPTODO: Negate the coeficient here.
-	}
+		return coeficient->Negate();
 
 	return true;
 }
@@ -321,7 +487,7 @@ bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 			if( !innerProductMultivector.InnerProductMultiply( *vector, termMultivector ) )
 				break;
 
-			// STPTODO: Negate innerProductMultivector here.
+			innerProductMultivector.Negate();
 
 			while( innerProductMultivector.sumOfTerms.Count() > 0 )
 			{
@@ -365,11 +531,37 @@ bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 	return success;
 }
 
+const Multivector::Term::ProductOfVectors::Node* Multivector::Term::FindVectorWithName( const char* name ) const
+{
+	const ProductOfVectors::Node* node = productOfVectors.Head();
+	while( node )
+	{
+		const Vector* vector = node->data;
+		if( 0 == strcmp( name, vector->name ) )
+			break;
+
+		node = node->Next();
+	}
+
+	return node;
+}
+
 // Note that we accumulate into this multivector and fail unless every term of the given multivector is an outer product.
 // Every accumulated term will be an outer product.
 bool Multivector::OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
-	
+	for( const SumOfTerms::Node* node = multivectorB.sumOfTerms.Head(); node; node = node->Next() )
+	{
+		const Term* term = node->data;
+		if( term->productType != Term::OUTER_PRODUCT )
+			return false;
+
+		if( term->FindVectorWithName( vectorA.name ) )
+			continue;
+
+		Term* newTerm = term->Clone();
+		newTerm->productOfVectors.InsertBefore()->data = vectorA.Clone();
+	}
 
 	return true;
 }
@@ -378,16 +570,80 @@ bool Multivector::OuterProductMultiply( const Vector& vectorA, const Multivector
 // Every accumulated term will be an outer product.
 bool Multivector::InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
+	for( const SumOfTerms::Node* node = multivectorB.sumOfTerms.Head(); node; node = node->Next() )
+	{
+		const Term* term = node->data;
+		if( term->productType != Term::OUTER_PRODUCT )
+			return false;
 
+		if( !term->InnerProductMultiply( vectorA, *this, false ) )
+			return false;
+	}
 
 	return false;
+}
+
+bool Multivector::Term::InnerProductMultiply( const Vector& vector, Multivector& multivector, bool vectorRight ) const
+{
+	if( productType != OUTER_PRODUCT )
+		return false;
+
+	if( productOfVectors.Count() == 0 )
+	{
+		Term* newTerm = new Term( OUTER_PRODUCT );
+		newTerm->coeficient->Assign( *coeficient );
+		newTerm->productOfVectors.InsertAfter()->data = vector.Clone();
+		multivector.sumOfTerms.InsertAfter()->data = newTerm;
+		return true;
+	}
+
+	bool negateNewTerms = false;
+	if( vectorRight && productOfVectors.Count() % 2 == 0 )
+		negateNewTerms = true;
+
+	ProductOfVectors::Node* node = const_cast< ProductOfVectors* >( &productOfVectors )->Head();
+
+	do
+	{
+		ProductOfVectors::Node* nextNode = node->Next();
+
+		const_cast< ProductOfVectors* >( &productOfVectors )->Remove( node );
+
+		Term* newTerm = Clone();
+		multivector.sumOfTerms.InsertAfter()->data = newTerm;
+
+		Scalar* innerProductScalar = theBilinearForm->InnerProduct( vector.name, node->data->name );
+		if( !newTerm->coeficient->AssignProduct( *newTerm->coeficient, *innerProductScalar ) )
+			return false;
+
+		if( negateNewTerms )
+			newTerm->coeficient->Negate();
+
+		if( nextNode )
+			const_cast< ProductOfVectors* >( &productOfVectors )->InsertBefore( nextNode, node );
+		else
+			const_cast< ProductOfVectors* >( &productOfVectors )->InsertAfter( 0, node );
+
+		node = nextNode;
+	}
+	while( node );
+
+	return true;
 }
 
 // Note that we accumulate into this multivector and fail unless every term of the given multivector is a geometric product.
 // Every accumulated term will be a geometric product.
 bool Multivector::GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
-	
+	for( const SumOfTerms::Node* node = multivectorB.sumOfTerms.Head(); node; node = node->Next() )
+	{
+		const Term* term = node->data;
+		if( term->productType != Term::GEOMETRIC_PRODUCT )
+			return false;
+
+		Term* newTerm = term->Clone();
+		newTerm->productOfVectors.InsertBefore()->data = vectorA.Clone();
+	}
 
 	return false;
 }
@@ -399,7 +655,6 @@ int Multivector::CountProductTypes( Term::ProductType productType ) const
 	for( const SumOfTerms::Node* node = sumOfTerms.Head(); node; node = node->Next() )
 	{
 		const Term* term = node->data;
-
 		if( term->productType == productType )
 			count++;
 	}

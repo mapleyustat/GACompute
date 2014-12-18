@@ -68,8 +68,6 @@ inline List< Data, DataManager >::Node::Node( void )
 	next = 0;
 	prev = 0;
 
-	list = 0;
-
 	DataManager::Create( data );
 }
 
@@ -175,7 +173,6 @@ inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Inse
 	}
 
 	count++;
-	insertedNode->list = this;
 
 	return insertedNode;
 }
@@ -200,7 +197,6 @@ inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Inse
 	}
 
 	count++;
-	insertedNode->list = this;
 
 	return insertedNode;
 }
@@ -208,9 +204,6 @@ inline typename List< Data, DataManager >::Node* List< Data, DataManager >::Inse
 template< class Data, class DataManager >
 inline bool List< Data, DataManager >::Remove( Node* node, bool deleteNode /*= true*/ )
 {
-	if( node->list != this )
-		return false;
-
 	if( node == head )
 		head = head->next;
 	if( node == tail )
@@ -273,8 +266,11 @@ inline void List< Data, DataManager >::Concatinate( const List& list )
 template< class Data, class DataManager >
 inline void List< Data, DataManager >::Copy( const List& list )
 {
-	RemoveAll();
-	Concatinate( list );
+	if( this != &list )
+	{
+		RemoveAll();
+		Concatinate( list );
+	}
 }
 
 template< class Data, class DataManager >

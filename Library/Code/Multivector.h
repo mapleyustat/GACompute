@@ -13,12 +13,16 @@ public:
 	bool AssignScalar( const Scalar& scalar );
 	bool AssignVector( const char* name );
 	bool AssignSum( const Multivector& multivectorA, const Multivector& multivectorB );
-	bool AssignScalarProduct( const Scalar& scalarB, const Multivector& multivectorA );
+	bool AssignScalarProduct( const Scalar& scalarA, const Multivector& multivectorB );
 	bool AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignOuterProduct( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignGeometricProduct( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignReverse( const Multivector& multivector );
 	bool AssignInverse( const Multivector& multivector );
+
+	bool Negate( void );
+	bool Scale( double number );
+	bool Reverse( void );
 
 	bool CalculateMagnitude( Scalar& scalar ) const;
 
@@ -55,12 +59,17 @@ private:
 
 		bool CombineWith( const Term* term, bool sortVectors = true );
 		bool SortProduct( void );
+		bool InnerProductMultiply( const Vector& vector, Multivector& multivector, bool vectorRight ) const;
+		bool InnerProductMultiply( const Term* term, Multivector& multivector ) const;
+		bool Reverse( void );
 
 		Scalar* coeficient;
 
 		// An empty list is one.
 		typedef List< Vector* > ProductOfVectors;
 		ProductOfVectors productOfVectors;
+
+		const ProductOfVectors::Node* FindVectorWithName( const char* name ) const;
 
 		ProductType productType;
 

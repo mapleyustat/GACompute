@@ -17,6 +17,10 @@ public:
 	bool AssignInnerProduct( const char* vectorA, const char* vectorB );
 	bool AssignInverse( const Scalar& scalar );
 
+	bool Negate( void );
+	bool Invert( void );
+	bool Scale( double number );
+
 	bool Print( char* buffer, int bufferSize, PrintStyle style ) const;
 
 	bool IsZero( void ) const;
@@ -114,6 +118,8 @@ private:
 		// An empty list is one.
 		typedef List< Factor* > ProductOfFactors;
 		ProductOfFactors productOfFactors;
+
+		ProductOfFactors::Node* FindTermOfFactorType( Factor::Type factorType );
 
 		void CombineFactors( void );
 	};
