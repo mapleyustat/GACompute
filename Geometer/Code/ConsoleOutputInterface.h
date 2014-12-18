@@ -13,7 +13,6 @@ namespace Geometer
 	class ConsoleOutputInterface;
 }
 
-//========================================================================
 class Geometer::ConsoleOutputInterface : public Geometer::Interface
 {
 public:

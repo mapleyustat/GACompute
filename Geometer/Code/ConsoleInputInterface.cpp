@@ -17,24 +17,20 @@ namespace Geometer
 
 using namespace Geometer;
 
-//========================================================================
 ConsoleInputInterface::ConsoleInputInterface( void )
 {
 }
 
-//========================================================================
 /*virtual*/ ConsoleInputInterface::~ConsoleInputInterface( void )
 {
 }
 
-//========================================================================
 /*virtual*/ void ConsoleInputInterface::FillOutRegistryEntry( RegistryEntry& entry )
 {
 	entry.interfaceMenuItemName = "Console Input";
 	entry.interfaceMenuItemHelp = "Toggle the conole input interface.";
 }
 
-//========================================================================
 /*virtual*/ bool ConsoleInputInterface::CreateControls( void )
 {
 	textControl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_PROCESS_ENTER );
@@ -54,13 +50,11 @@ ConsoleInputInterface::ConsoleInputInterface( void )
 	return true;
 }
 
-//========================================================================
 /*virtual*/ bool ConsoleInputInterface::UpdateControls( void )
 {
 	return true;
 }
 
-//========================================================================
 void ConsoleInputInterface::OnExecute( wxCommandEvent& event )
 {
 	lua_State* L = wxGetApp().LuaState();

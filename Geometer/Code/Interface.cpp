@@ -13,7 +13,6 @@ Interface::Registry Interface::registry;
 
 int Interface::masterUpdateKey = 0;
 
-//========================================================================
 /*static*/ void Interface::PopulateRegistry( void )
 {
 	wxClassInfo* interfaceClassInfo = wxClassInfo::FindClass( "Interface" );
@@ -30,7 +29,6 @@ int Interface::masterUpdateKey = 0;
 	}
 }
 
-//========================================================================
 /*static*/ bool Interface::Register( const wxClassInfo* classInfo )
 {
 	wxString className = classInfo->GetClassName();
@@ -54,7 +52,6 @@ int Interface::masterUpdateKey = 0;
 	return true;
 }
 
-//========================================================================
 /*static*/ bool Interface::Unregister( const wxClassInfo* classInfo )
 {
 	wxString className = classInfo->GetClassName();
@@ -66,24 +63,20 @@ int Interface::masterUpdateKey = 0;
 	return true;
 }
 
-//========================================================================
 /*static*/ const Interface::Registry& Interface::GetRegistry( void )
 {
 	return registry;
 }
 
-//========================================================================
 Interface::Interface( void )
 {
 	updateKey = masterUpdateKey - 1;
 }
 
-//========================================================================
 /*virtual*/ Interface::~Interface( void )
 {
 }
 
-//========================================================================
 void Interface::TouchedLuaState( bool updateThisToo /*= true*/ )
 {
 	masterUpdateKey++;

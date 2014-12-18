@@ -11,7 +11,6 @@ namespace Geometer
 
 using namespace Geometer;
 
-//========================================================================
 Application::Application( void )
 {
 	frame = 0;
@@ -19,12 +18,10 @@ Application::Application( void )
 	L = 0;
 }
 
-//========================================================================
 /*virtual*/ Application::~Application( void )
 {
 }
 
-//========================================================================
 /*virtual*/ bool Application::OnInit( void )
 {
 	if( !wxApp::OnInit() )
@@ -46,7 +43,6 @@ Application::Application( void )
 	return true;
 }
 
-//========================================================================
 /*virtual*/ int Application::OnExit( void )
 {
 	lua_close(L);

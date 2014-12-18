@@ -7,7 +7,6 @@
 
 using namespace Geometer;
 
-//========================================================================
 Frame::Frame( wxWindow* parent ) : wxFrame( parent, wxID_ANY, "Geometer" )
 {
 	auiManager = new wxAuiManager( this, wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT );
@@ -41,14 +40,12 @@ Frame::Frame( wxWindow* parent ) : wxFrame( parent, wxID_ANY, "Geometer" )
 	auiManager->Update();
 }
 
-//========================================================================
 /*virtual*/ Frame::~Frame( void )
 {
 	auiManager->UnInit();
 	delete auiManager;
 }
 
-//========================================================================
 void Frame::SaveFrameConfig( void )
 {
 	wxConfig* config = new wxConfig( "GeometerFrameConfig" );
@@ -86,7 +83,6 @@ void Frame::SaveFrameConfig( void )
 	delete config;
 }
 
-//========================================================================
 void Frame::RestoreFrameConfig( void )
 {
 	wxConfig* config = new wxConfig( "GeometerFrameConfig" );
@@ -129,7 +125,6 @@ void Frame::RestoreFrameConfig( void )
 	delete config;
 }
 
-//========================================================================
 void Frame::PopulateInterfaceMenu( void )
 {
 	const Interface::Registry& interfaceRegistry = Interface::GetRegistry();
@@ -142,7 +137,6 @@ void Frame::PopulateInterfaceMenu( void )
 	}
 }
 
-//========================================================================
 bool Frame::AddInterfaceMenuItem( const Interface::RegistryEntry& entry )
 {
 	if( entry.interfaceMenuItemId != -1 )
@@ -165,7 +159,6 @@ bool Frame::AddInterfaceMenuItem( const Interface::RegistryEntry& entry )
 	return true;
 }
 
-//========================================================================
 bool Frame::RemoveInterfaceMenuItem( const Interface::RegistryEntry& entry )
 {
 	wxMenuItem* menuItem = interfaceMenu->FindItem( entry.interfaceMenuItemId );
@@ -180,7 +173,6 @@ bool Frame::RemoveInterfaceMenuItem( const Interface::RegistryEntry& entry )
 	return true;
 }
 
-//========================================================================
 int Frame::FindUnusedInterfaceMenuItemId( void )
 {
 	int menuItemId = ID_InterfacePanelStart;
@@ -189,7 +181,6 @@ int Frame::FindUnusedInterfaceMenuItemId( void )
 	return menuItemId;
 }
 
-//========================================================================
 bool Frame::IsInterfaceMenuItemIdUsed( int menuItemId )
 {
 	const wxMenuItemList& itemsList = interfaceMenu->GetMenuItems();
@@ -202,12 +193,10 @@ bool Frame::IsInterfaceMenuItemIdUsed( int menuItemId )
 	return false;
 }
 
-//========================================================================
 void Frame::OnAbout( wxCommandEvent& event )
 {
 }
 
-//========================================================================
 void Frame::OnExit( wxCommandEvent& event )
 {
 	SaveFrameConfig();
@@ -215,7 +204,6 @@ void Frame::OnExit( wxCommandEvent& event )
 	Close( true );
 }
 
-//========================================================================
 void Frame::OnIdle( wxIdleEvent& event )
 {
 	wxAuiPaneInfoArray& paneInfoArray = auiManager->GetAllPanes();
@@ -232,7 +220,6 @@ void Frame::OnIdle( wxIdleEvent& event )
 	event.RequestMore();
 }
 
-//========================================================================
 void Frame::OnToggleInterface( wxCommandEvent& event )
 {
 	Interface* iface = FindInterfaceByMenuItemId( event.GetId() );
@@ -249,7 +236,6 @@ void Frame::OnToggleInterface( wxCommandEvent& event )
 	auiManager->Update();
 }
 
-//========================================================================
 // One possible weakness of our design here is that at most one
 // instance of an interface can ever be instantiated.  It might be
 // useful to have more than one instance of an interface in the overall UI.
@@ -274,7 +260,6 @@ bool Frame::CreateInterface( const Interface::RegistryEntry* entry )
 	return true;
 }
 
-//========================================================================
 bool Frame::DestroyInterface( Interface* iface )
 {
 	auiManager->DetachPane( iface );
@@ -282,7 +267,6 @@ bool Frame::DestroyInterface( Interface* iface )
 	return true;
 }
 
-//========================================================================
 void Frame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 {
 	if( event.GetId() >= ID_InterfacePanelStart )
@@ -292,7 +276,6 @@ void Frame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 	}
 }
 
-//========================================================================
 Interface* Frame::FindInterfaceByMenuItemId( int menuItemId )
 {
 	Interface* foundInterface = 0;
@@ -309,7 +292,6 @@ Interface* Frame::FindInterfaceByMenuItemId( int menuItemId )
 	return foundInterface;
 }
 
-//========================================================================
 const Interface::RegistryEntry* Frame::FindInterfaceRegistryEntryByMenuItemId( int menuItemId )
 {
 	const Interface::Registry& interfaceRegistry = Interface::GetRegistry();
@@ -324,7 +306,6 @@ const Interface::RegistryEntry* Frame::FindInterfaceRegistryEntryByMenuItemId( i
 	return 0;
 }
 
-//========================================================================
 const Interface::RegistryEntry* Frame::FindInterfaceRegistryEntryByClassName( const wxString& className )
 {
 	const Interface::Registry& interfaceRegistry = Interface::GetRegistry();
@@ -335,7 +316,6 @@ const Interface::RegistryEntry* Frame::FindInterfaceRegistryEntryByClassName( co
 	return &entry;
 }
 
-//========================================================================
 wxWindow* Frame::FindCenterPane( void )
 {
 	wxAuiPaneInfoArray& paneInfoArray = auiManager->GetAllPanes();

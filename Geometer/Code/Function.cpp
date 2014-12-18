@@ -12,7 +12,6 @@ using namespace Geometer;
 
 #define GEOMETER_FUNCTION		"Geometer.Function"
 
-//========================================================================
 /*static*/ void Function::RegisterFunctions( void )
 {
 	wxClassInfo* functionClassInfo = wxClassInfo::FindClass( "Function" );
@@ -29,7 +28,6 @@ using namespace Geometer;
 	}
 }
 
-//========================================================================
 /*static*/ bool Function::Register( const wxClassInfo* classInfo )
 {
 	wxObjectConstructorFn constructorFunc = classInfo->GetConstructor();
@@ -44,7 +42,6 @@ using namespace Geometer;
 	return Register( function );
 }
 
-//========================================================================
 /*static*/ bool Function::Register( Function* function )
 {
 	lua_State* L = wxGetApp().LuaState();
@@ -67,7 +64,6 @@ using namespace Geometer;
 	return true;
 }
 
-//========================================================================
 /*static*/ bool Function::Unregister( const wxString& functionName )
 {
 	lua_State* L =  wxGetApp().LuaState();
@@ -85,17 +81,14 @@ using namespace Geometer;
 	return true;
 }
 
-//========================================================================
 Function::Function( void )
 {
 }
 
-//========================================================================
 /*virtual*/ Function::~Function( void )
 {
 }
 
-//========================================================================
 /*static*/ int Function::EntryPoint( lua_State* L )
 {
 	Function** userData = ( Function** )luaL_testudata( L, lua_upvalueindex(1), GEOMETER_FUNCTION );
@@ -106,7 +99,6 @@ Function::Function( void )
 	return function->Call( L );
 }
 
-//========================================================================
 /*static*/ int Function::GarbageCollect( lua_State* L )
 {
 	Function** userData = ( Function** )luaL_checkudata( L, 1, GEOMETER_FUNCTION );

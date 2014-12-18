@@ -14,25 +14,21 @@ namespace Geometer
 
 using namespace Geometer;
 
-//========================================================================
 ConsoleOutputInterface::ConsoleOutputInterface( void )
 {
 	linesRead = 0;
 }
 
-//========================================================================
 /*virtual*/ ConsoleOutputInterface::~ConsoleOutputInterface( void )
 {
 }
 
-//========================================================================
 /*virtual*/ void ConsoleOutputInterface::FillOutRegistryEntry( RegistryEntry& entry )
 {
 	entry.interfaceMenuItemName = "Console Output";
 	entry.interfaceMenuItemHelp = "Toggle the conole output interface.";
 }
 
-//========================================================================
 /*virtual*/ bool ConsoleOutputInterface::CreateControls( void )
 {
 	textControl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY );
@@ -44,7 +40,6 @@ ConsoleOutputInterface::ConsoleOutputInterface( void )
 	return true;
 }
 
-//========================================================================
 /*virtual*/ bool ConsoleOutputInterface::UpdateControls( void )
 {
 	bool updated = false;

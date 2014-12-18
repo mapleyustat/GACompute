@@ -11,7 +11,6 @@ namespace Geometer
 	class Interface;
 }
 
-//========================================================================
 // Derivatives of this class provide a UI into the Lua state.
 // A derivative of this class may one day be created that allows
 // plugins to extend the application by providing their own interfaces.

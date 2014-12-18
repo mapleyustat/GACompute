@@ -10,7 +10,6 @@ namespace Geometer
 	class CanvasInterface;
 }
 
-//========================================================================
 class Geometer::CanvasInterface : public Geometer::Interface
 {
 public:

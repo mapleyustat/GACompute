@@ -9,17 +9,14 @@ namespace Geometer
 
 using namespace Geometer;
 
-//========================================================================
 PrintFunction::PrintFunction( void )
 {
 }
 
-//========================================================================
 /*virtual*/ PrintFunction::~PrintFunction( void )
 {
 }
 
-//========================================================================
 /*virtual*/ int PrintFunction::Call( lua_State* L )
 {
 	const char* string = luaL_checkstring( L, 1 );
@@ -60,7 +57,6 @@ PrintFunction::PrintFunction( void )
 	return 0;
 }
 
-//========================================================================
 /*virtual*/ wxString PrintFunction::LuaFunctionName( void )
 {
 	return "print";

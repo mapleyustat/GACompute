@@ -15,7 +15,6 @@ namespace Geometer
 	class Frame;
 }
 
-//========================================================================
 class Geometer::Frame : public wxFrame
 {
 public:

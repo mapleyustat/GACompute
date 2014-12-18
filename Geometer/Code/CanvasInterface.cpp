@@ -9,30 +9,25 @@ namespace Geometer
 
 using namespace Geometer;
 
-//========================================================================
 CanvasInterface::CanvasInterface( void )
 {
 }
 
-//========================================================================
 /*virtual*/ CanvasInterface::~CanvasInterface( void )
 {
 }
 
-//========================================================================
 /*virtual*/ void CanvasInterface::FillOutRegistryEntry( RegistryEntry& entry )
 {
 	entry.interfaceMenuItemName = "Canvas Interface";
 	entry.interfaceMenuItemHelp = "Toggle the canvas interface.";
 }
 
-//========================================================================
 /*virtual*/ bool CanvasInterface::CreateControls( void )
 {
 	return true;
 }
 
-//========================================================================
 /*virtual*/ bool CanvasInterface::UpdateControls( void )
 {
 	return true;

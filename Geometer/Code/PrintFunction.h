@@ -10,7 +10,6 @@ namespace Geometer
 	class PrintFunction;
 }
 
-//========================================================================
 class Geometer::PrintFunction : public Geometer::Function
 {
 public:

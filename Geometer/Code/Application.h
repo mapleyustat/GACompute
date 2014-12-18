@@ -17,7 +17,6 @@ namespace Geometer
 	class Application;
 }
 
-//========================================================================
 class Geometer::Application : public wxApp
 {
 public:
@@ -39,7 +38,6 @@ private:
 	lua_State* L;
 };
 
-//========================================================================
 namespace Geometer
 {
 	wxDECLARE_APP( Application );
