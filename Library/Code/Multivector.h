@@ -76,14 +76,11 @@ private:
 
 	SumOfTerms::Node* FindTermOfProductType( Term::ProductType productType );
 
-	// This performs the desired product between the two given multivectors.
 	bool Multiply( const Multivector& multivectorA, const Multivector& multivectorB, Term::ProductType productType );
 
-	// These perform the named product, expecting the given multivector to be homogeneous of the given product type.
-	// The resulting multivector will also be homogeneous of the given grade.
-	bool OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
-	bool InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
-	bool GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType );
+	bool OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB );
+	bool InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB );
+	bool GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB );
 
 	int CountProductTypes( Term::ProductType productType ) const;
 };

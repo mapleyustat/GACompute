@@ -214,6 +214,7 @@ bool Multivector::CollectTerms( Term::ProductType productType )
 }
 
 // Note that in the interest of efficiency, we do not preserve this term in this process.
+// Also note that we accumulate into the given multivector.
 bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 {
 	ProductType targetProductType = OtherProductType( productType );
@@ -237,15 +238,6 @@ bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 		return true;
 	}
 
-	Scalar* scalar = 0;
-	
-	if( !coeficient->IsOne() )
-	{
-		scalar = coeficient;
-		coeficient = new Scalar();
-		coeficient->Assign( 1.0 );
-	}
-
 	ProductOfVectors::Node* node = productOfVectors.Head();
 	Vector* vector = node->data;
 	productOfVectors.Remove( node, false );
@@ -254,23 +246,47 @@ bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 
 	do
 	{
+		if( targetProductType == GEOMETRIC_PRODUCT )
+		{
+			Multivector termMultivector;
+			termMultivector.sumOfTerms.InsertAfter()->data = Clone();
+			
+			Multivector innerProductMultivector;
+			if( !innerProductMultivector.InnerProductMultiply( *vector, termMultivector ) )
+				break;
+
+			// STPTODO: Negate innerProductMultivector here.
+
+			while( innerProductMultivector.sumOfTerms.Count() > 0 )
+			{
+				SumOfTerms::Node* node = innerProductMultivector.sumOfTerms.Head();
+				Term* term = node->data;
+
+				if( !term->PerformProductMorphism( multivector ) )
+					break;
+
+				innerProductMultivector.sumOfTerms.Remove( node, true );
+			}
+
+			if( innerProductMultivector.sumOfTerms.Count() > 0 )
+				break;
+		}
+
 		Multivector subMultivector;
 		if( !PerformProductMorphism( subMultivector ) )
 			break;
 
-		if( !multivector.InnerProductMultiply( *vector, subMultivector, targetProductType ) )
-			break;
-
-		if( targetProductType == GEOMETRIC_PRODUCT )
+		if( targetProductType == OUTER_PRODUCT )
 		{
-			if( !multivector.OuterProductMultiply( *vector, subMultivector, OUTER_PRODUCT ) )
+			if( !multivector.InnerProductMultiply( *vector, subMultivector ) )
+				break;
+
+			if( !multivector.OuterProductMultiply( *vector, subMultivector ) )
 				break;
 		}
-		else
+		else if( targetProductType == GEOMETRIC_PRODUCT )
 		{
-			// STPTODO: Negate multivector here.
-
-			if( !multivector.GeometricProductMultiply( *vector, subMultivector, GEOMETRIC_PRODUCT ) )
+			if( !multivector.GeometricProductMultiply( *vector, subMultivector ) )
 				break;
 		}
 
@@ -280,39 +296,32 @@ bool Multivector::Term::PerformProductMorphism( Multivector& multivector )
 
 	delete node;
 
-	if( scalar )
-	{
-		if( success )
-		{
-			// Scale multivector by scalar here...
-		}
-
-		delete scalar;
-	}
-
 	return success;
 }
 
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType )
+// Note that we accumulate into this multivector and fail unless every term of the given multivector is an outer product.
+// Every accumulated term will be an outer product.
+bool Multivector::OuterProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
-	if( homogeneousProductType == Term::GEOMETRIC_PRODUCT )
-		return false;		// Not yet supported.  (Could write it in terms of other functions.)
+	
 
 	return true;
 }
 
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType )
+// Note that we accumulate into this multivector and fail unless every term of the given multivector is an outer product.
+// Every accumulated term will be an outer product.
+bool Multivector::InnerProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
+
+
 	return false;
 }
 
-// Note that we accumulate into this multivector and fail if not all terms are of the given type.
-bool Multivector::GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB, Term::ProductType homogeneousProductType )
+// Note that we accumulate into this multivector and fail unless every term of the given multivector is a geometric product.
+// Every accumulated term will be a geometric product.
+bool Multivector::GeometricProductMultiply( const Vector& vectorA, const Multivector& multivectorB )
 {
-	if( homogeneousProductType == Term::OUTER_PRODUCT )
-		return false;		// Not yet supported.  (Could write it in terms of other functions.)
+	
 
 	return false;
 }
