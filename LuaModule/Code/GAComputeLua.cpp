@@ -2,11 +2,8 @@
 
 #include "GAComputeLua.h"
 #include "Version.h"
-#include "NewScalar.h"
-#include "NewVector.h"
+#include "NewUserData.h"
 #include "BilinearForm.h"
-
-// STPTODO: A lot of functionality should be exposed by a new user-data having a meta-table that overloads operators and provides methods.
 
 static luaL_Reg gacomputelua_api[] =
 {

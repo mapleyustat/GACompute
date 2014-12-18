@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../Lua/Code"
+				AdditionalIncludeDirectories="../Lua/Code; ../Library/Code"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;EXPORT_GACOMPUTELUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,9 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Lua.lib"
+				AdditionalDependencies="GACompute.lib Lua.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../Build/Lua/Debug"
+				AdditionalLibraryDirectories="..\Build\Lua\Debug\; ..\Build\GACompute\Debug\"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -119,8 +119,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../Lua/Code"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GACOMPUTELUA_EXPORTS"
+				AdditionalIncludeDirectories="../Lua/Code; ../Library/Code"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;EXPORT_GACOMPUTELUA"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -138,9 +138,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Lua.lib"
+				AdditionalDependencies="Lua.lib; GACompute.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="../Build/Lua/Release"
+				AdditionalLibraryDirectories="..\Build\Lua\Release\; ..\Build\GACompute\Release\"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -195,19 +195,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Code\NewScalar.cpp"
+				RelativePath=".\Code\NewUserData.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Code\NewScalar.h"
+				RelativePath=".\Code\NewUserData.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Code\NewVector.cpp"
+				RelativePath=".\Code\UserData.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Code\NewVector.h"
+				RelativePath=".\Code\UserData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\UserDataOverload.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Code\UserDataOverload.h"
 				>
 			</File>
 			<File

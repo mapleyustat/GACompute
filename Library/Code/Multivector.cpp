@@ -27,7 +27,19 @@ bool Multivector::AssignScalar( const Scalar& scalar )
 	return true;
 }
 
-bool Multivector::AssignVector( const char* name )
+bool Multivector::AssignScalar( const char* scalarName )
+{
+	//...
+	return true;
+}
+
+bool Multivector::AssignScalar( double number )
+{
+	//...
+	return true;
+}
+
+bool Multivector::AssignVector( const char* vectorName )
 {
 	//...
 	return true;

@@ -11,7 +11,9 @@ public:
 
 	bool Assign( const Multivector& multivector );
 	bool AssignScalar( const Scalar& scalar );
-	bool AssignVector( const char* name );
+	bool AssignScalar( const char* scalarName );
+	bool AssignScalar( double number );
+	bool AssignVector( const char* vectorName );
 	bool AssignSum( const Multivector& multivectorA, const Multivector& multivectorB );
 	bool AssignScalarProduct( const Scalar& scalarA, const Multivector& multivectorB );
 	bool AssignInnerProduct( const Multivector& multivectorA, const Multivector& multivectorB );
