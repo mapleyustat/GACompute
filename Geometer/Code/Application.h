@@ -34,7 +34,6 @@ private:
 
 	Frame* frame;
 
-	// Implement undo/redo in a trivial way using the Lua state?
 	lua_State* L;
 };
 

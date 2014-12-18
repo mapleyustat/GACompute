@@ -11,6 +11,9 @@ namespace Geometer
 	class Interface;
 }
 
+// STPTODO: Provide an interface that lets the user load and unload Lua modules.  Have that interface persist state across instantiations of geometer?
+// STPTODO: Provide an interface to all global variables?
+
 // Derivatives of this class provide a UI into the Lua state.
 // A derivative of this class may one day be created that allows
 // plugins to extend the application by providing their own interfaces.

@@ -86,7 +86,9 @@ void ConsoleInputInterface::OnExecute( wxCommandEvent& event )
 
 	textControl->SetFocus();
 
-	// TODO: Concatinate to console.input.
+	// STPTODO: Concatinate to console.input.
+
+	// STPTODO: Support input history navigation.
 
 	TouchedLuaState( false );
 }

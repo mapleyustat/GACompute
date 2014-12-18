@@ -2,6 +2,7 @@
 
 #include <wx/config.h>
 #include <wx/tokenzr.h>
+#include <wx/aboutdlg.h>
 
 #include "Frame.h"
 
@@ -195,6 +196,15 @@ bool Frame::IsInterfaceMenuItemIdUsed( int menuItemId )
 
 void Frame::OnAbout( wxCommandEvent& event )
 {
+	wxAboutDialogInfo aboutDlgInfo;
+
+	aboutDlgInfo.SetName( "Geometer" );
+	aboutDlgInfo.SetVersion( "1.0" );
+	aboutDlgInfo.SetDescription( "A wxWidgets interface to Lua with GA supporting modules." );
+	aboutDlgInfo.SetCopyright( "(C) 2015" );
+	aboutDlgInfo.AddDeveloper( "Spencer T. Parkin" );
+
+	wxAboutBox( aboutDlgInfo );
 }
 
 void Frame::OnExit( wxCommandEvent& event )
