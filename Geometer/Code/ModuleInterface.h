@@ -29,6 +29,8 @@ public:
 
 private:
 
+	void OnContextMenu( wxDataViewEvent& event );
+
 	class DataViewModel : public wxDataViewModel
 	{
 	public:
@@ -48,17 +50,33 @@ private:
 		{
 			enum Type { MODULE, API_CALL };
 			Type type;
-			wxString module;
 			wxString label;
 			wxString description;
+			wxString module;
 		};
 
 		typedef std::map< int, Entry > ItemMap;
 		mutable ItemMap itemMap;
 		mutable int nextId;
+
+		bool LookupEntry( const wxDataViewItem& item, Entry& entry ) const;
+		void MakeNewEntry( wxDataViewItem& item, const Entry& entry ) const;
 	};
 
 	wxDataViewCtrl* dataViewCtrl;
+
+	wxDataViewItem contextItem;
+
+	enum
+	{
+		ID_ContextMenu_LoadNewModule,
+		ID_ContextMenu_UnloadThisModule,
+		ID_ContextMenu_ReloadThisModule,
+	};
+
+	void OnContextMenu_LoadNewModule( wxCommandEvent& event );
+	void OnContextMenu_UnloadThisModule( wxCommandEvent& event );
+	void OnContextMenu_ReloadThisModule( wxCommandEvent& event );
 };
 
 #endif //__ModuleInterface_h__

@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="../Build/GAComputeLua/$(ConfigurationName)"
+			OutputDirectory="../Build/$(ConfigurationName)"
 			IntermediateDirectory="../Build/GAComputeLua/$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="1"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="GACompute.lib Lua.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\Build\Lua\Debug\; ..\Build\GACompute\Debug\"
+				AdditionalLibraryDirectories="..\Build\Debug\"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"

@@ -33,12 +33,55 @@ ModuleInterface::ModuleInterface( void )
 	dataViewCtrl->AssociateModel( dataViewModel.get() );
 
 	dataViewCtrl->AppendTextColumn( "Entry", 0, wxDATAVIEW_CELL_INERT );
+	dataViewCtrl->AppendTextColumn( "Description", 1, wxDATAVIEW_CELL_INERT );
 
 	wxBoxSizer* boxSizer = new wxBoxSizer( wxVERTICAL );
 	boxSizer->Add( dataViewCtrl, 1, wxGROW );
 	SetSizer( boxSizer );
 
+	Bind( wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, &ModuleInterface::OnContextMenu, this );
+	Bind( wxEVT_MENU, &ModuleInterface::OnContextMenu_LoadNewModule, this, ID_ContextMenu_LoadNewModule );
+	Bind( wxEVT_MENU, &ModuleInterface::OnContextMenu_UnloadThisModule, this, ID_ContextMenu_UnloadThisModule );
+	Bind( wxEVT_MENU, &ModuleInterface::OnContextMenu_ReloadThisModule, this, ID_ContextMenu_ReloadThisModule );
+
 	return true;
+}
+
+void ModuleInterface::OnContextMenu( wxDataViewEvent& event )
+{
+	DataViewModel* dataViewModel = ( DataViewModel* )dataViewCtrl->GetModel();
+
+	contextItem = event.GetItem();
+	DataViewModel::Entry entry;
+	if( !dataViewModel->LookupEntry( contextItem, entry ) )
+		return;
+
+	if( entry.type != DataViewModel::Entry::MODULE )
+		return;
+
+	wxMenu contextMenu;
+
+	contextMenu.Append( ID_ContextMenu_LoadNewModule, "Load New Module" );
+	contextMenu.Append( ID_ContextMenu_UnloadThisModule, "Unload This Module" );
+	contextMenu.Append( ID_ContextMenu_ReloadThisModule, "Reload This Module" );
+
+	wxPoint point = event.GetPosition();
+	PopupMenu( &contextMenu, point );
+}
+
+void ModuleInterface::OnContextMenu_LoadNewModule( wxCommandEvent& event )
+{
+	//...
+
+	//TouchedLuaState();
+}
+
+void ModuleInterface::OnContextMenu_UnloadThisModule( wxCommandEvent& event )
+{
+}
+
+void ModuleInterface::OnContextMenu_ReloadThisModule( wxCommandEvent& event )
+{
 }
 
 /*virtual*/ bool ModuleInterface::UpdateControls( void )
@@ -59,7 +102,7 @@ ModuleInterface::DataViewModel::DataViewModel( void )
 
 /*virtual*/ unsigned int ModuleInterface::DataViewModel::GetColumnCount() const
 {
-	return 1;
+	return 2;
 }
 
 /*virtual*/ wxString ModuleInterface::DataViewModel::GetColumnType( unsigned int col ) const
@@ -67,21 +110,29 @@ ModuleInterface::DataViewModel::DataViewModel( void )
 	return "";
 }
 
-/*virtual*/ void ModuleInterface::DataViewModel::GetValue( wxVariant& variant, const wxDataViewItem& item, unsigned int col ) const
+bool ModuleInterface::DataViewModel::LookupEntry( const wxDataViewItem& item, Entry& entry ) const
 {
 	int id = ( int )item.m_pItem;
 
 	ItemMap::const_iterator iter = itemMap.find( id );
 	if( iter == itemMap.end() )
-		return;
+		return false;
 
-	const Entry& entry = iter->second;
+	entry = iter->second;
+	return true;
+}
 
-	if( col == 0 )
-		variant = entry.label;
+/*virtual*/ void ModuleInterface::DataViewModel::GetValue( wxVariant& variant, const wxDataViewItem& item, unsigned int col ) const
+{
+	Entry entry;
+	if( !LookupEntry( item, entry ) )
+		variant = "???";
 	else
 	{
-		//...
+		if( col == 0 )
+			variant = entry.label;
+		else if( col == 1 )
+			variant = entry.description;
 	}
 }
 
@@ -101,57 +152,102 @@ ModuleInterface::DataViewModel::DataViewModel( void )
 	if( !item.IsOk() )
 		return true;
 
+	int id = ( int )item.m_pItem;
+
+	ItemMap::const_iterator iter = itemMap.find( id );
+	if( iter == itemMap.end() )
+		return false;
+
+	const Entry& entry = iter->second;
+	if( entry.type == Entry::MODULE )
+		return true;
+
 	return false;
+}
+
+void ModuleInterface::DataViewModel::MakeNewEntry( wxDataViewItem& item, const Entry& entry ) const
+{
+	int id = nextId++;
+	itemMap[ id ] = entry;
+	item.m_pItem = ( void* )id;
 }
 
 /*virtual*/ unsigned int ModuleInterface::DataViewModel::GetChildren( const wxDataViewItem& item, wxDataViewItemArray& children ) const
 {
-	if( !item.IsOk() )
+	lua_State* L = wxGetApp().LuaState();
+
+	int stackTop = lua_gettop( L );
+
+	lua_getglobal( L, "package" );
+	if( lua_isnil( L, -1 ) )
+		return 0;
+
+	lua_getfield( L, -1, "loaded" );
+
+	do
 	{
-		nextId = 1;
-		itemMap.clear();
-
-		lua_State* L = wxGetApp().LuaState();
-
-		int stackTop = lua_gettop( L );
-
-		lua_getglobal( L, "package" );
-		if( lua_isnil( L, -1 ) )
-			return 0;
-
-		lua_getfield( L, -1, "loaded" );
-
-		lua_pushnil( L );
-		while( lua_next( L, -2 ) )
+		if( !item.IsOk() )
 		{
-			const char* moduleName = lua_tostring( L, -2 );
+			nextId = 1;
+			itemMap.clear();
 
-			if( 0 != strcmp( moduleName, "_G" ) )
+			lua_pushnil( L );
+			while( lua_next( L, -2 ) )
 			{
-				Entry entry;
-				entry.module = moduleName;
-				entry.label = moduleName;
-				entry.description = "";
-				entry.type = Entry::MODULE;
+				const char* moduleName = lua_tostring( L, -2 );
 
-				int id = nextId++;
-				itemMap[ id ] = entry;
-
+				Entry modEntry;
+				modEntry.type = Entry::MODULE;
+				modEntry.label = moduleName;
+				modEntry.module = moduleName;
+				modEntry.description = lua_typename( L, lua_type( L, -1 ) );
+					
 				wxDataViewItem item;
-				item.m_pItem = ( void* )id;
+				MakeNewEntry( item, modEntry );
 				children.push_back( item );
+
+				lua_pop( L, 1 );
 			}
-
-			lua_pop( L, 1 );
 		}
+		else
+		{
+			Entry modEntry;
+			if( !LookupEntry( item, modEntry ) )
+				break;
 
-		while( stackTop < lua_gettop( L ) )
-			lua_pop( L, 1 );
+			if( modEntry.type != Entry::MODULE )
+				break;
+
+			lua_getfield( L, -1, modEntry.module );
+			if( !lua_istable( L, -1 ) )
+				break;
+
+			lua_pushnil( L );
+			while( lua_next( L, -2 ) )
+			{
+				if( lua_isfunction( L, -1 ) )
+				{
+					const char* funcName = lua_tostring( L, -2 );
+					
+					Entry apiEntry;
+					apiEntry.type = Entry::API_CALL;
+					apiEntry.label = funcName;
+					apiEntry.module = modEntry.module;
+					apiEntry.description = lua_typename( L, lua_type( L, -1 ) );
+
+					wxDataViewItem item;
+					MakeNewEntry( item, apiEntry );
+					children.push_back( item );
+				}
+
+				lua_pop( L, 1 );
+			}
+		}
 	}
-	else
-	{
-		// STPTODO: Lookup the entry's module and iterate over api calls here.
-	}
+	while( false );
+
+	while( stackTop < lua_gettop( L ) )
+		lua_pop( L, 1 );
 
 	return children.Count();
 }

@@ -198,7 +198,10 @@ static void ll_unloadlib (void *lib) {
 static void *ll_load (lua_State *L, const char *path, int seeglb) {
   HMODULE lib = LoadLibraryExA(path, NULL, LUA_LLE_FLAGS);
   (void)(seeglb);  /* not used: symbols are 'global' by default */
-  if (lib == NULL) pusherror(L);
+  if (lib == NULL) {
+	  DWORD error = GetLastError();
+	  pusherror(L);
+  }
   return lib;
 }
 

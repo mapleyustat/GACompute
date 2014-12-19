@@ -19,7 +19,7 @@ CanvasInterface::CanvasInterface( void )
 
 /*virtual*/ void CanvasInterface::FillOutRegistryEntry( RegistryEntry& entry )
 {
-	entry.interfaceMenuItemName = "Canvas Interface";
+	entry.interfaceMenuItemName = "Canvas";
 	entry.interfaceMenuItemHelp = "Toggle the canvas interface.";
 }
 
