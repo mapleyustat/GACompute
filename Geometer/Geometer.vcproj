@@ -236,6 +236,14 @@
 					RelativePath=".\Code\ConsoleOutputInterface.h"
 					>
 				</File>
+				<File
+					RelativePath=".\Code\ModuleInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Code\ModuleInterface.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Functions"
